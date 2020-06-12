@@ -11,22 +11,17 @@ def _not_impl():
 
 class RequestDebugger(object):
     """ 脚本调试工具 """
+    __slots__ = ()
+
     __set_debug__ = False
 
-    __ctx__ = ContextVar('debugger context', default=None)
+    __ctx__ = ContextVar('debugger', default=None)
 
     def __getattr__(self, item):
-        ctx = self.__ctx__.get()
-        if ctx is None:
-            _not_impl()
         try:
             return self.__ctx__.get()[item]
-        except KeyError:
+        except:
             _not_impl()
-
-    @staticmethod
-    def __bases__():
-        return object
 
     @contextmanager
     def run(self, request_task, context=None):
@@ -60,6 +55,8 @@ class RequestDebugger(object):
         token = self.__ctx__.set(context)
         yield self
         self.__ctx__.reset(token)
+
+    __bases__ = (object,)
 
 
 # 脚本的调试工具

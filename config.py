@@ -67,7 +67,7 @@ WORKER_CONFIG = {
         'max_concurrent': 2,
         'timeout': None,
         'source': r'',
-        'name': 'ffmpeg.exe',
+        'name': 'ffmpeg',
         'overwrite': True,
         'async': True,
     },

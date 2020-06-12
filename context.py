@@ -1,12 +1,15 @@
+from debugger import dbg
 
-class NodeContext:
+
+class NodeContext(object):
     __slots__ = ()
 
-    def __init__(self, **kwargs):
-        _ = {self.__setattr__(k, v) for k, v in kwargs.items()}
+    def __init_subclass__(cls, name, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.name = name
 
 
-class RootInfo(NodeContext):
+class RootInfo(NodeContext, name='root_info'):
     """
     Attributes:
         ...
@@ -18,11 +21,14 @@ class RootInfo(NodeContext):
     """
     __slots__ = ('get_data', )
 
+    def __init__(self, wf, abcde):
+        self.get_data = wf.root.get_data
+
     def __getitem__(self, item):
         return self.get_data(item)
 
 
-class FlowNodeContext(NodeContext):
+class FlowNodeContext(NodeContext, name='flow'):
     """
     Attributes:
         abcde: 工作流节点标号
@@ -50,6 +56,14 @@ class FlowNodeContext(NodeContext):
     """
     __slots__ = ('abcde', 'prev', 'next', 'find_by_name',
                  'append_node', 'get_node')
+
+    def __init__(self, wf, abcde):
+        self.abcde = abcde
+        self.prev = lambda: wf.prev_stage(abcde)
+        self.next = lambda: wf.next_stage(abcde)
+        self.find_by_name = wf.find_by_name
+        self.get_node = wf.get_node
+        self.append_node = lambda request: self.get_node(dbg.flow.abcde).add_child(request)
 
     a = property(lambda self: self.abcde[0])
     b = property(lambda self: self.abcde[1])

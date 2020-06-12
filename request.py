@@ -30,7 +30,7 @@ def jsruntime(session, **kwargs):
 
 @requester('convert')
 async def convert():
-    import ffmpeg
+    import _ffmpeg
     results = []
 
     merges = dbg.flow.find_by_name('ffmpeg')
@@ -41,8 +41,8 @@ async def convert():
         # 对于没有经过ffmpeg处理的工具，默认将下载的音频资源全经过
         downloads = dbg.flow.find_by_name('download')
         for filename in [download.get_data('pathname') for download in downloads]:
-            converter = ffmpeg.convert(filename)
-            node = dbg.flow.append_node(converter)
+            converter = _ffmpeg.convert(filename)
+            node = dbg.flow.attach_node(converter)
             result = await node.start_request()
             results.append(converter.get_data('pathname'))
 
@@ -62,139 +62,118 @@ async def cleanup():
         shutil.rmtree(tempdir)
 
 
-@requester('download', base_cls=(Request, URIs))
-async def download(**kwargs):
-    """ """
-    # 基类初始化
-    self = dbg.__self__
-    URIs.__init__(self)
-    self.put(**kwargs)
-    # 开始下载
-    # '[32-0-01-9].example'
-    a, b, c, d, e = dbg.flow.abcde
-    name = f'[{"-".join([f"{_:02}" for _ in [a, b, c, d]])}].{dbg.root_info["title"]}'
-    path = dbg.root_info['tempdir']
-    file_path = os.path.join(path, name)
-    rq = DlRequest(file_path=file_path)
-    for uri in self.dumps():
-        uri.pop('id')
-        rq.put(**uri)
+class DownloadRequest(Request, URIs):
+    name = 'download'
 
-    exception = None
-    print(name)
-    async with dlopen(rq) as dl:
-        dbg.upload(
-            size=dl.file.size,
-            pathname=dl.file.pathname,
-        )
-        dbg.set_percent(dl.percent_complete)
-        dbg.set_timeleft(dl.remaining_time)
-        dbg.set_speed(lambda: f'{(dl.transfer_rate() / 1024):.2f} kb/s')
-
-        dl.start(loop=asyncio.get_running_loop())
-        while not dl._future:
-            await asyncio.sleep(0.01)
-
-        async for exception in dl.aexceptions():
-            dbg.warning(exception.exc_info)
-            print(exception)
-            await dl.apause()
-        await dl.ajoin()
-
-    if exception:
-        # 若发生异常，抛出异常
-        raise exception
-
-    # 更新文件信息
-    dbg.upload(
-        pathname=dl.file.pathname,
-        size=dl.file.size,
-    )
-
-
-class FFmpegRequest(Request):
-    """ 合并请求。"""
-    name = 'ffmpeg'
-
-    def __init__(self, inputs, callable_cmd, **kwargs):
-        """
-        :param
-            parent:      请求的所属脚本任务
-            method:     合并方法
-            sources:    合并源
-            **kwargs:
-
-        """
-        self.inputs = inputs
-        self.callable_cmd = callable_cmd
-        self.kwargs = kwargs
-
-    def subrequest(self):
-        inputs = self.inputs
-        if not isinstance(inputs, (list, tuple, set)):
-            inputs = [inputs]
-        return [input for input in inputs if _is_related_types(input)]
+    def __init__(self, **kwargs):
+        URIs.__init__(self)
+        if kwargs:
+            self.put(**kwargs)
 
     async def end_request(self):
-        from ffmpeg import FFmpegEngine
-
-        def input2pathname(input):
-            if isinstance(input, str):
-                return input
-            elif _is_related_types(input):
-                return input.get_data('pathname')
-            assert input
-
-        def percent():
-            nonlocal time_length, ffmpeg
-            return ffmpeg.length() * 100 / (time_length or float('info'))
-
-        time_length = dbg.root_info.get_data('length', None)
-
         # '[32-0-01-9].example'
         a, b, c, d, e = dbg.flow.abcde
-        name = f'[{"-".join([f"{_:02}" for _ in [a, b, c, d, *e]])}].{dbg.root_info["title"]}'
+        name = f'[{"-".join([f"{_:02}" for _ in [a, b, c, d]])}].{dbg.root_info["title"]}'
         path = dbg.root_info['tempdir']
+        file_path = os.path.join(path, name)
+        rq = DlRequest(file_path=file_path)
+        for uri in self.dumps():
+            uri.pop('id')
+            rq.put(**uri)
 
-        file_path = os.path.join(path, name + dbg.root_info['to_format'])
+        exception = None
+        print(name)
+        async with dlopen(rq) as dl:
+            dbg.upload(
+                size=dl.file.size,
+                pathname=dl.file.pathname,
+            )
+            dbg.set_percent(dl.percent_complete)
+            dbg.set_timeleft(dl.remaining_time)
+            dbg.set_speed(lambda: f'{(dl.transfer_rate() / 1024):.2f} kb/s')
 
-        inputs = self.inputs
-        if not isinstance(inputs, (list, tuple, set)):
-            inputs = [inputs]
+            dl.start(loop=asyncio.get_running_loop())
+            while not dl._future:
+                await asyncio.sleep(0.01)
 
-        cmd = self.callable_cmd(
-            inputs=[input2pathname(input) for input in inputs],
-            output=file_path,
-            **self.kwargs
-        )
+            async for exception in dl.aexceptions():
+                dbg.warning(exception.exc_info)
+                print(exception)
+                await dl.apause()
+            await dl.ajoin()
 
-        source = os.path.join(dbg.config['source'], dbg.config['name'])
+        if exception:
+            # 若发生异常，抛出异常
+            raise exception
 
-        if isinstance(cmd, (list, tuple)):
-            cmd = [source] + list(cmd)
-            cmd = list2cmdline(cmd)
-        else:
-            cmd = f'{source} ' + cmd
-
-        if dbg.config['overwrite']:
-            cmd += ' -y'
-
-        process = await asyncio.create_subprocess_shell(
-            cmd,
-            stdin=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        ffmpeg = FFmpegEngine(process)
-        dbg.set_speed(ffmpeg.speed)
-        dbg.set_percent(percent)
-
+        # 更新文件信息
         dbg.upload(
-            cmd=cmd,
-            pathname=file_path
+            pathname=dl.file.pathname,
+            size=dl.file.size,
         )
 
-        await ffmpeg.run(timeout=dbg.config.get('timeout', None))
+
+@requester('ffmpeg')
+async def ffmpeg(inputs, callable_cmd, **kwargs):
+    from _ffmpeg import FFmpegEngine
+
+    def input2pathname(input):
+        if isinstance(input, str):
+            return input
+        elif _is_related_types(input):
+            return input.get_data('pathname')
+        assert input
+
+    def percent():
+        nonlocal time_length, _ffmpeg
+        return _ffmpeg.length() * 100 / (time_length or float('info'))
+
+    time_length = dbg.root_info.get_data('length', None)
+
+    # '[32-0-01-9].example'
+    a, b, c, d, e = dbg.flow.abcde
+    name = f'[{"-".join([f"{_:02}" for _ in [a, b, c, d, *e]])}].{dbg.root_info["title"]}'
+    path = dbg.root_info['tempdir']
+
+    file_path = os.path.join(path, name + dbg.root_info['to_format'])
+
+    inputs = inputs
+    if not isinstance(inputs, (list, tuple, set)):
+        inputs = [inputs]
+
+    cmd = callable_cmd(
+        inputs=[input2pathname(input) for input in inputs],
+        output=file_path,
+        **kwargs
+    )
+
+    source = os.path.join(dbg.config['source'], dbg.config['name'])
+
+    if isinstance(cmd, (list, tuple)):
+        cmd = [source] + list(cmd)
+        cmd = list2cmdline(cmd)
+    else:
+        cmd = f'{source} ' + cmd
+
+    if dbg.config['overwrite']:
+        cmd += ' -y'
+
+    process = await asyncio.create_subprocess_shell(
+        cmd,
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    _ffmpeg = FFmpegEngine(process)
+    dbg.set_speed(_ffmpeg.speed)
+    dbg.set_percent(percent)
+
+    dbg.upload(
+        cmd=cmd,
+        pathname=file_path
+    )
+
+    await _ffmpeg.run(timeout=dbg.config.get('timeout', None))
 
 
 class TaskRequest(Request):
@@ -251,7 +230,7 @@ class TaskRequest(Request):
 
         def percent():
             """ 任务完成百分比。 """
-            p = [[node.request.percent() if node.is_active() else 0
+            p = [[node.cont.progress.percent if node.is_active() else 0
                   for node in flow.every()] for flow in self.flows if flow]
             p = [sum(i)/len(i) for i in p if i]
             if not p:
@@ -296,7 +275,7 @@ class TaskRequest(Request):
 
     def details(self, log=False):
         def _node_sketch(node):
-            sketch = node.request.sketch()
+            sketch = node.cont.sketch()
             abcde = node.abcde
             sketch.update({
                 'abcde': str(abcde),
@@ -390,3 +369,16 @@ class ScriptRequest(RootRequest):
 
     def __repr__(self):
         return f'<ScriptRequest "{self.url}">'
+
+
+download = DownloadRequest
+# ffmpeg = FFmpegRequest
+
+
+__all__ = ('download',
+           # 'FFmpegRequest',
+           'ffmpeg',
+           'cleanup',
+           'convert',
+           'requester',
+           'TaskRequest')

@@ -1,4 +1,4 @@
-from context import RootInfo, FlowNodeContext
+from context import RootInfo, FlowNodeContext, NodeContext
 from debugger import dbg
 from weakref import proxy
 from debugger import dbg
@@ -20,7 +20,7 @@ class Node:
 
 
 class RequestNode(Node):
-    __slots__ = 'parent', 'abcde', 'request', 'children'
+    __slots__ = 'parent', 'abcde', 'cont', 'children'
 
     def __init__(self, parent, abcde, request):
         """
@@ -35,12 +35,12 @@ class RequestNode(Node):
         """
         self.abcde = abcde
         self.parent = parent
-        self.request = request
+        self.cont = request
         self.children = []
 
     @property
     def name(self):
-        return self.request.name
+        return self.cont.name
 
     def start_request(self, context=None):
         async def _async_run():
@@ -54,17 +54,20 @@ class RequestNode(Node):
             if self.children:
                 await asyncio.wait([child.start_request(ctx)
                                     for child in self.children])
-            return await self.request.start_request(ctx)
+
+                # await asyncio.wait([child.start_request(child)
+                #                     for child in self.children])
+            return await self.cont.start_request(ctx)
         return _async_run()
 
     def get_data(self, name, default=None):
-        return self.request.get_data(name, default)
+        return self.cont.get_data(name, default)
 
     def getresponse(self):
-        return self.request.getresponse()
+        return self.cont.getresponse()
 
     def is_active(self):
-        return self.request.is_active()
+        return self.cont.is_active()
 
     def __len__(self):
         return len(self.children)
@@ -158,23 +161,25 @@ class RequestWorkflow:
         return return_node
 
     def get_context(self, abcde):
-        return {
-            'root_info': RootInfo(get_data=self.root.get_data),
-            'flow': FlowNodeContext(
-                abcde=abcde,
-                prev=lambda: self.prev_stage(abcde),
-                next=lambda: self.next_stage(abcde),
+        subclasses = NodeContext.__subclasses__()
+        return {context_factor.name: context_factor(self, abcde) for context_factor in subclasses}
+        # return {
+        #     'root_info': RootInfo(get_data=self.root.get_data),
+        #     'flow': FlowNodeContext(
+        #         abcde=abcde,
+        #         prev=lambda: self.prev_stage(abcde),
+        #         next=lambda: self.next_stage(abcde),
+        #
+        #         find_by_name=self.find_by_name,
+        #         append_node=self.attach_node,
+        #         get_node=self.get_node,
+        #
+        #     ),
+        # }
 
-                find_by_name=self.find_by_name,
-                append_node=self.__append_node,
-                get_node=self.get_node,
-
-            ),
-        }
-
-    def __append_node(self, request):
-        rq_node = self.get_node(dbg.flow.abcde)
-        return rq_node.add_child(request)
+    # def append_node(self, request):
+    #     rq_node = self.get_node(dbg.flow.abcde)
+    #     return rq_node.add_child(request)
 
     def find_by_name(self, name):
         a, b, c, d, e = dbg.flow.abcde
@@ -301,7 +306,8 @@ async def run_branch(branch_flow):
             work: 执行工作流节点/阶段
         """
         done, pending = await asyncio.wait(
-            [_serial_worker(w) for w in work], return_when=asyncio.FIRST_EXCEPTION)
+            [_serial_worker(w) for w in work],
+            return_when=asyncio.FIRST_EXCEPTION)
 
         # 取消工作流任务
         for unfinished_task in pending:

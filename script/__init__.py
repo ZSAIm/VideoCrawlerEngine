@@ -18,6 +18,7 @@ class ScriptBaseClass(object):
         from config import new_script_config, get_script_config
         from .base import ScriptBaseClass
         from request import script_request
+        import _ffmpeg
 
         class TestScript(cls, ScriptBaseClass):
             # 继承base.py基类
@@ -28,7 +29,7 @@ class ScriptBaseClass(object):
 
         script = ScriptTask(TestScript, config)
         # 打开调试模式
-        dbg.__set_debug__ = True
+        # dbg.__set_debug__ = True
         script_request = script_request(url, rule=rule, script=script)
         with dbg.run(script_request):
             dbg.start()
@@ -207,7 +208,7 @@ def compile_script(script_name, verify=True):
                     # 域-脚本 映射。
                     for domain in v.supported_domains:
                         registered_domains[domain].append('%s-%s' % (v.name, v.version))
-            except TypeError:
+            except TypeError as e:
                 # 非继承ScriptBaseClass，跳过检测
                 continue
     return None

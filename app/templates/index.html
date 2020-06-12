@@ -1,5 +1,15 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
 
+{% block title %}Flasky{% endblock %}
 
+{% block task_content %}
 
+{% include '_task.html' %}
 
+{% endblock task_content %}
+
+{% block modal %}
+{% include '_modal.html' with context %}
+{% endblock %}

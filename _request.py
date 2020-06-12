@@ -14,8 +14,14 @@ class Request:
 
     """
     name = None
-
     __progress__ = None
+
+    @property
+    def progress(self):
+        return self.__progress__
+
+    def is_active(self):
+        return bool(self.__progress__)
 
     def start_request(self, context=None):
         if context is None:
@@ -48,79 +54,33 @@ class Request:
     def get_data(self, name, default=None):
         return self.__progress__.data.get(name, default)
 
-    def is_active(self):
-        return bool(self.__progress__)
-
     def sketch(self):
         return self.__progress__.sketch()
 
     def details(self, log=False):
         return self.__progress__.details(log)
 
-    def percent(self):
-        return self.__progress__.percent
+    def pause(self):
+        return NotImplemented
 
-    def status(self):
-        return self.__progress__.status
-
-    def speed(self):
-        return self.__progress__.speed
-
-    def timeleft(self):
-        return self.__progress__.timeleft
+    def stop(self):
+        return NotImplemented
 
     def __repr__(self):
         return f'<{self.__class__.__name__}>'
 
 
 def requester(request_name,
-              initializer=None,
-              sub_getter=None,
-              base_cls=(Request,),
-              sketch_data=()):
+              sketch_data=(),
+              auto_search=True):
     """ 简单请求构建器。
     Args:
         request_name: 请求者名称
-        sub_getter: 子请求获取器，参数 self
-        initializer: 子请求初始器，参数 self
-        base_cls: 请求基类
         sketch_data: 上传upload的数据中被sketch()返回的数据字段组成的列表。
-
+        auto_search:
     """
     def wrapper(func):
         argnames, varargs, varkw, defaults, kwonlyargs, kwonlydefaults, annotations = getfullargspec(func)
-
-        class WrapperRequest(*base_cls):
-            name = request_name
-
-            def __init__(self, **kwargs):
-                self.args = ()
-                self.kwargs = {}
-                _ = {self.__setattr__(k, v) for k, v in kwargs.items()}
-
-            __slots__ = list(argnames) + kwonlyargs + ['args', 'kwargs']
-            __doc__ = func.__doc__
-
-            def end_request(self):
-                return func()
-
-            if sub_getter is not None:
-                subrequest = sub_getter
-
-            if sketch_data:
-                def sketch(self):
-                    sketch = Request.sketch(self)
-                    sketch.update({self.get_data(data) for data in sketch_data})
-                    return sketch
-
-        WrapperRequest.__name__ = f'{request_name.capitalize()}Request'
-
-        if iscoroutinefunction(func):
-            async def inner_worker(*args, **kwargs):
-                return await func(*args, **kwargs)
-        else:
-            def inner_worker(*args, **kwargs):
-                return func(*args, **kwargs)
 
         @wraps(func)
         def wrapped(*args, **kwargs):
@@ -138,11 +98,80 @@ def requester(request_name,
                 'args': args[narg:],
                 'kwargs': kwargs
             })
-            req = WrapperRequest(**kws)
-            if callable(initializer):
-                initializer(req)
+            req = result(**kws)
             req.end_request = partial(inner_worker, *args, **kwargs)
+            if auto_search:
+                subs = _search_request(args)
+                subs.extend(_search_request(kwargs))
+                req.__subrequest__ = tuple(subs)
             return req
+
+        if iscoroutinefunction(func):
+            async def inner_worker(*args, **kwargs):
+                return await func(*args, **kwargs)
+        else:
+            def inner_worker(*args, **kwargs):
+                return func(*args, **kwargs)
+
+        def __init__(self, **kwargs):
+            self.args = ()
+            self.kwargs = {}
+            _ = {self.__setattr__(k, v) for k, v in kwargs.items()}
+
+        def __repr__(self):
+            return f'<{self.__name__}>'
+
+        def subrequest(self):
+            return self.__subrequest__
+
+        __doc__ = f''
+
+        __name__ = f'{request_name.title()}Request'
+
+        __slots__ = tuple(list(argnames) + kwonlyargs + ['args', 'kwargs'])
+        class_namespace = {
+            'name': request_name,
+            'subrequest': subrequest,
+            '__slots__': __slots__,
+            '__init__': __init__,
+            '__repr__': __repr__,
+            '__subrequest__': (),
+            '__simple__': wrapped
+        }
+
+        result = type(__name__, (Request, ), class_namespace)
+
+        def _search_request(arg):
+            def _list_tuple_set(o):
+                for v in o:
+                    if _is_related_types(v):
+                        rs.append(v)
+                    else:
+                        _do(v)
+
+            def _dict(o):
+                for k, v in o.items():
+                    if _is_related_types(k):
+                        rs.append(k)
+                    else:
+                        _do(k)
+                    if _is_related_types(v):
+                        rs.append(v)
+                    else:
+                        _do(v)
+
+            def _do(o):
+                typ = type(o)
+                if typ in (list, tuple, set):
+                    _list_tuple_set(o)
+                elif typ is dict:
+                    _dict(arg)
+                elif _is_related_types(arg):
+                    rs.append(arg)
+
+            rs = []
+            _do(arg)
+            return rs
 
         return wrapped
     return wrapper
@@ -176,7 +205,10 @@ def get_requester(name):
     """
     for req_cls in Request.__subclasses__():
         if name == req_cls.name:
-            return req_cls
+            if getattr(req_cls, '__simple__', None):
+                return req_cls.__simple__
+            else:
+                return req_cls
     return None
 
 

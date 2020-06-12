@@ -8,9 +8,8 @@ Version:    0.1
 License:    Apache-2.0
 ==================================
 """
-from request import next_script, download, Optional, Option
+from request import next_script, download, Optional, Option, ffmpeg
 from script import ScriptBaseClass, dbg
-import ffmpeg
 import json
 import re
 
