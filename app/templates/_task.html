@@ -2,17 +2,30 @@
 <ul class="tasks">
     {% for task in tasks %}
     <li class="task">
+        <div class="task-status"></div>
         <div class="task-thumbnail">
-            <a href="">
+            <a href="#">
                 <img class="img-rounded profile-thumbnail" src="">
             </a>
         </div>
         <div class="task-content">
-            <div class="task-date"></div>
-            <div class="task-title"><a href="">hhhhhhhhhhhhh</a></div>
+            <div class="task-tip fa fa-lightbulb-o" data-toggle="tooltip" title=""></div>
+            <div class="task-title">hhhhhhhhhhhhh</div>
+            <div class="task-percent">0%</div>
             <div class="task-body">
 
                 asdasdasdasdasdasdasdasdasdasdasdasdasd?????????/
+            </div>
+            <div class="task-footer">
+                <div class="progress task-progress">
+                    <div class="progress-bar bg-success" style="width: 50%;">
+                        download
+                    </div>
+                    <div class="progress-bar bg-info" style="width: 30%;">
+                        ffmpeg
+                    </div>
+                </div>
+
             </div>
         </div>
     </li>

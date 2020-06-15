@@ -39,11 +39,10 @@ class NullWorker(Worker):
         pass
 
 
-class Workers(Worker, ThreadPoolExecutor):
+class Workers(Worker):
     """ 工作线程"""
     def __init__(self, name, max_workers, *, initializer=None, initargs=()):
         Worker.__init__(self, name)
-        ThreadPoolExecutor.__init__(self, max_workers)
         self.workers = ThreadPoolExecutor(max_workers, thread_name_prefix=name,
                                           initializer=initializer, initargs=initargs)
 
@@ -60,7 +59,7 @@ class Workers(Worker, ThreadPoolExecutor):
         return request_entrypoint(*args, **kwargs)
 
     def shutdown(self, wait=True):
-        return ThreadPoolExecutor.shutdown(self, wait)
+        return self.workers.shutdown(wait)
 
 
 class AsyncWorkers(Workers):
@@ -95,42 +94,54 @@ class AsyncWorkers(Workers):
         self.workers.submit(setup_async_thread)
 
     def submit(self, *args, **kwargs):
-        return asyncio.wrap_future(
-            asyncio.run_coroutine_threadsafe(self.run(*args, **kwargs), self.loop))
+        fut = asyncio.run_coroutine_threadsafe(self.run(*args, **kwargs), self.loop)
+        try:
+            loop = asyncio.get_running_loop()
+            fut = asyncio.wrap_future(fut)
+        except RuntimeError:
+            pass
+        return fut
 
     async def run(self, *args, **kwargs):
         async with self._sema:
             return await async_entrypoint(*args, **kwargs)
 
     def shutdown(self, wait=True):
-        self.loop.stop()
+        self.loop.call_soon_threadsafe(self.loop.stop)
         super().shutdown(wait)
 
 
 async def async_entrypoint(task, context):
-    try:
-        with dbg.run(task, context) as debug:
+    with dbg.run(task, context) as debug:
+        try:
             debug.start()
             result = await task.end_request()
             debug.task_done()
+        except BaseException as err:
+            print_exc()
+            task.error_handler(err)
+            raise
+        finally:
             debug.close()
-    except BaseException as err:
-        print_exc()
-        result = task.error_handler(err)
+
     return result
 
 
 def request_entrypoint(task, context):
     """ 请求任务处理入口点。 """
-    try:
-        with dbg.run(task, context) as debug:
+    with dbg.run(task, context) as debug:
+        try:
             debug.start()
             result = task.end_request()
             debug.task_done()
             debug.close()
-    except BaseException as err:
-        print_exc()
-        result = task.error_handler(err)
+        except BaseException as err:
+            print_exc()
+            task.error_handler(err)
+            raise
+        finally:
+            debug.close()
+
     return result
 
 

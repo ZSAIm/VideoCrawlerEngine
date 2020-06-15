@@ -23,7 +23,6 @@ class ScriptBaseClass(BaseClass):
         name:               名称
         version:            版本
         supported_domains:  支持的域
-        TIMEOUT:            默认网络请求超时时间，作用于方法request，即其子方法。
     """
     name = 'base'
     version = 0.0

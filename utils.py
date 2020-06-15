@@ -12,6 +12,8 @@ from asyncio import tasks
 
 from config import get_config, SECTION_WORKER
 
+NoneType = type(None)
+
 
 def current_time():
     """ 返回 '时:分:秒' 格式的当前时间文本。"""
@@ -126,7 +128,7 @@ def json_stringify(source,
             return check_list_tuple_set(o)
         elif isinstance(o, dict):
             return check_dict(o)
-        elif type(o) in (int, float, str, bytes):
+        elif type(o) in (int, float, str, bytes, NoneType):
             if o in keys:
                 o = replace
             return o
@@ -209,7 +211,7 @@ class PipeStreamHandler:
 
 @contextmanager
 def js_session(source, timeout=None, engine=None):
-    from request import jsruntime
+    from requester.request import jsruntime
 
     worker = get_config(SECTION_WORKER, 'jsruntime')
 

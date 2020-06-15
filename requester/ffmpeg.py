@@ -2,7 +2,7 @@ from functools import wraps
 from debugger import dbg
 from utils import PipeStreamHandler
 from datetime import datetime
-from request import ffmpeg
+from requester.request import ffmpeg
 import time
 import re
 import os
@@ -82,6 +82,8 @@ def ffmpeg_operator(func):
     @wraps(func)
     def wrapper(inputs, **kwargs):
         return ffmpeg(inputs, callable_cmd=func, **kwargs)
+
+    # FFmpeg操作方法添加到ffmpeg请求器
     setattr(ffmpeg, func.__name__, wrapper)
     return wrapper
 

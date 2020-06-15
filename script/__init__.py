@@ -17,8 +17,7 @@ class ScriptBaseClass(object):
         最后返回由该脚本构成的脚本请求ScriptRequest。"""
         from config import new_script_config, get_script_config
         from .base import ScriptBaseClass
-        from request import script_request
-        import _ffmpeg
+        from requester.request import script_request
 
         class TestScript(cls, ScriptBaseClass):
             # 继承base.py基类
@@ -68,13 +67,9 @@ class ScriptTask:
         self.script_cls = script
         self.config = config
 
-    def __call__(self, url, rule=None, **kwargs):
+    def __call__(self, url, quality=None, **kwargs):
         script_cls = self.script_cls
         config = self.config
-        if rule is None:
-            rule = config.get('selection_rule')
-        qn = script_cls.quality_ranking
-        quality = qn[max(0, int((100 - rule) * len(qn) / 100) - 1)]
         return script_cls(config, url, quality, **kwargs)
 
     @property
@@ -207,7 +202,7 @@ def compile_script(script_name, verify=True):
                     v.run.__globals__.update(scope)
                     # 域-脚本 映射。
                     for domain in v.supported_domains:
-                        registered_domains[domain].append('%s-%s' % (v.name, v.version))
+                        registered_domains[domain.rstrip('/')].append('%s-%s' % (v.name, v.version))
             except TypeError as e:
                 # 非继承ScriptBaseClass，跳过检测
                 continue
@@ -252,7 +247,12 @@ def supported_script(url):
         url:            提供要处理的URL。
         with_version:   返回名称是否带有版本号。
     """
-    return registered_domains.get(urlparse(url).netloc, [])
+    netloc = urlparse(url).netloc
+    result = []
+    for k, v in registered_domains.items():
+        if netloc.endswith(k):
+            result.extend(v)
+    return result
 
 
 def register(script_name, sha256_key):

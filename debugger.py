@@ -42,11 +42,13 @@ class RequestDebugger(object):
 
         if context is None:
             context = {}
-        context.update(_export_progress(request_task.__progress__))
+
+        context.update(_export_progress(request_task.progress))
         startupinfo = {
             'name': _get_dbg_context('name'),
         }
         context.update({
+            'error_handler': request_task.error_handler,
             'name': request_task.name,
             'config': get_config(SECTION_WORKER, request_task.name),
             'startupinfo': startupinfo,
@@ -67,6 +69,9 @@ def _export_progress(progress):
     exports = {}
     for attr in progress.EXPORT_ATTR:
         exports[f'set_{attr}'] = partial(progress.__setattr__, attr)
+
+    for attr in progress.EXPORT_ATTR:
+        exports[f'get_{attr}'] = partial(getattr, progress, attr)
 
     for meth in progress.EXPORT_METH:
         exports[meth] = getattr(progress, meth)

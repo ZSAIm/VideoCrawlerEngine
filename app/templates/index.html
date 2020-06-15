@@ -5,11 +5,9 @@
 {% block title %}Flasky{% endblock %}
 
 {% block task_content %}
-
-{% include '_task.html' %}
-
+    {% include '_task.html' with context %}
 {% endblock task_content %}
 
 {% block modal %}
-{% include '_modal.html' with context %}
+    {% include '_modal.html' with context %}
 {% endblock %}

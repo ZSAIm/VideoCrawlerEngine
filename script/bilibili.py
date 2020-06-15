@@ -8,8 +8,9 @@ Version:    0.1
 License:    Apache-2.0
 ==================================
 """
-from request import next_script, download, Optional, Option, ffmpeg
+from requester import next_script, download, Optional, Option, ffmpeg
 from script import ScriptBaseClass, dbg
+import bs4
 import json
 import re
 
@@ -64,7 +65,7 @@ class Bilibili(ScriptBaseClass):
     author = 'ZSAIM'
     created_date = '2020/03/05'
 
-    supported_domains = ['www.bilibili.com']
+    supported_domains = ['bilibili.com']
     quality_ranking = [116, 80, 74, 64, 32, 16]
 
     def _init(self):
@@ -137,9 +138,9 @@ class Bilibili(ScriptBaseClass):
             result = self.api_playurl(request_params)
             results.append(Optional(result))
 
-        results.append(
-            next_script('https://www.bilibili.com/video/BV15Z4y1x7uk', rule=1, quality=self.quality)
-        )
+        # results.append(
+        #     next_script('https://www.bilibili.com/video/BV15Z4y1x7uk', rule=1, quality=self.quality)
+        # )
 
         dbg.upload(items=results)
 
@@ -252,11 +253,7 @@ class Bilibili(ScriptBaseClass):
 if __name__ == '__main__':
     # 重载基类
     from script.base import ScriptBaseClass
-    import bs4
-
-    # 继承基类
-    # class Bilibili(Bilibili, ScriptBaseClass):
-    #     pass
 
     bilibili = Bilibili.test('https://www.bilibili.com/video/av91721893', 100)
+    # bilibili = Bilibili.test('https://www.bilibili.com/video/BV1sK411p7vg', 100)
     print(bilibili)

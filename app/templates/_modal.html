@@ -2,7 +2,7 @@
 
 
 
-<div class="modal fade" id="new-modal">
+<div class="modal fade" id="submitModal">
 	<div class="modal-dialog">
 		<div class="modal-content">
             <!-- 模态框头部 -->
@@ -11,12 +11,12 @@
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 			</div>
 
-			<form id="newTaskForm">
-
+			<form id="submitTaskForm">
+				{{ form.csrf_token }}
 				<!-- 模态框主体 -->
 				<div class="modal-body">
-					<textarea name="uris" id="urls" placeholder="支持多个URL地址,每个连接占一行."
-							  style="width: 100%; min-height: 100px"></textarea>
+					<textarea name="urls" id="urls" placeholder=""
+							  style="width: 100%; min-height: 200px"></textarea>
 				</div>
 				<!-- 模态框尾部 -->
 				<div class="modal-footer">

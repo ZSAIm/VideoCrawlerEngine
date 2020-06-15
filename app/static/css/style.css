@@ -1,3 +1,6 @@
+body, html {
+    height: 100%;
+}
 .profile-thumbnail {
     position: absolute;
 }
@@ -10,10 +13,13 @@ ul.tasks {
     padding: 0px;
     margin: 16px 0px 0px 0px;
     border-top: 1px solid #e0e0e0;
+    overflow-y: scroll;
+    height: 100%;
 }
 ul.tasks li.task {
     padding: 8px;
     border-bottom: 1px solid #e0e0e0;
+    height: 82px;
 }
 ul.tasks li.task:hover {
     background-color: #f0f0f0;
@@ -21,44 +27,46 @@ ul.tasks li.task:hover {
 div.task-date {
     float: right;
 }
-div.task-author {
+div.task-body {
+    font-size: 12px;
+    color: #6c757d;
+}
+div.task-title {
     font-weight: bold;
+}
+div.task-tip {
+    float: right;
+}
+div.task-percent {
+    float: right;
+    font-size: 12px;
 }
 div.task-thumbnail {
     position: absolute;
 }
+div.task-status {
+    width: 8px;
+    float: left;
+    height: 100%;
+    background-color: black;
+}
+div.task-footer {
+    display: flex;
+    height: 25px;
+}
+
+div.task-footer div.task-progress {
+    border-radius: 1px;
+    flex: 1;
+    margin-top: auto;
+    margin-bottom: auto;
+    height: 15px;
+}
+
+
 div.task-content {
-    margin-left: 48px;
+    margin-left: 20px;
     min-height: 48px;
-}
-div.pagination {
-    width: 100%;
-    text-align: right;
-    padding: 0px;
-    margin: 0px;
-}
-div.flask-pagedown-preview {
-    margin: 10px 0px 10px 0px;
-    border: 1px solid #e0e0e0;
-    padding: 4px;
-}
-div.flask-pagedown-preview h1 {
-    font-size: 140%;
-}
-div.flask-pagedown-preview h2 {
-    font-size: 130%;
-}
-div.flask-pagedown-preview h3 {
-    font-size: 120%;
-}
-.task-body h1 {
-    font-size: 140%;
-}
-.task-body h2 {
-    font-size: 130%;
-}
-.task-body h3 {
-    font-size: 120%;
 }
 
 
@@ -67,7 +75,15 @@ div.flask-pagedown-preview h3 {
     max-width: none;
     padding-right: 0px;
     padding-left: 0px;
-    margin-right: 10px;
+    margin-right: 0px;
     margin-left: 10px;
+    padding-top: 66px;
+    margin-top: -20px;
+    height: 100%;
+
+}
+.container .container-list {
+    height: 100%;
+    width: 100%;
 }
 
