@@ -110,6 +110,7 @@ class Scripts:
         self.name = name
         self.scripts = {}
         self._active = None
+        self.config = get_script_config(self.name) or new_script_config()
 
     @property
     def supported_domains(self):
@@ -128,8 +129,8 @@ class Scripts:
         script = self.scripts.get(version, None)
         if script is None:
             return None
-        config = get_script_config(script.name) or new_script_config()
-        return ScriptTask(script, config)
+        # config = get_script_config(script.name) or new_script_config()
+        return ScriptTask(script, dict(self.config))
 
     def install(self, script):
         """ 安装已编译的脚本。
@@ -297,5 +298,3 @@ def init_scripts():
         if script and active_version is not None:
             # 激活配置中的默认信息。
             script.active(active_version)
-
-

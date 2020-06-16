@@ -1,7 +1,8 @@
 from context import NodeContext
 from debugger import dbg
 from _request import (Request, Option, Optional, RootRequest,
-                      _abcde_stringify, _all_status, REQ_QUEUING, REQ_ERROR)
+                      _all_status, REQ_QUEUING, REQ_ERROR)
+from utils import concat_abcde
 from traceback import format_exc
 from threading import Thread
 import asyncio
@@ -63,7 +64,7 @@ class RequestNode(BaseNode):
     def sketch(self):
         sketch = self.cont.sketch()
         sketch.update({
-            'abcde': _abcde_stringify(self.abcde),
+            'abcde': concat_abcde(self.abcde),
         })
         return sketch
 
@@ -141,7 +142,7 @@ class BranchFlow(BaseNode):
                 work = [work]
             for node in work:
                 if self._stopped:
-                    raise WorkflowStoppedError('stop signal')
+                    raise WorkflowStoppedError(wf)
                 if type(work) in (list, tuple) and len(node) > 1:
                     await _parallel_worker(node)
                 else:
@@ -155,7 +156,7 @@ class BranchFlow(BaseNode):
                     else:
                         dbg.success(
                             f'Node Finished: \n'
-                            f'abcde={_abcde_stringify(node.abcde)}\n'
+                            f'abcde={concat_abcde(node.abcde)}\n'
                             f'name={node.name}\n')
                     finally:
                         self.running.remove(node)
@@ -168,7 +169,6 @@ class BranchFlow(BaseNode):
             done, pending = await asyncio.wait(
                 [_serial_worker(w) for w in work],
                 return_when=asyncio.FIRST_EXCEPTION)
-
             # 取消工作流任务
             for unfinished_task in pending:
                 unfinished_task.cancel()
@@ -189,11 +189,11 @@ class BranchFlow(BaseNode):
         nodes = list(self.every())
         timeleft = sum([node.timeleft() for node in nodes]) / len(nodes)
         return {
-            'abcde': _abcde_stringify(self.abcde),
+            'abcde': concat_abcde(self.abcde),
             'percent': self.percent(),
             'status': _all_status(nodes),
             'timeleft': timeleft,
-            'running': [_abcde_stringify(node.abcde) for node in self.running],
+            'running': [concat_abcde(node.abcde) for node in self.running],
             'n': len(nodes),
             'all': [node.sketch() for node in nodes]
         }
@@ -296,7 +296,7 @@ class BaseWorkflow:
         pass
 
     def __repr__(self):
-        return f'<{self.__class__.__name__} sketch={self.sketch()}>'
+        return f'<{self.__class__.__name__}>'
 
 
 class PendingWorkflow(BaseWorkflow):
@@ -339,7 +339,7 @@ class Workflow(BaseWorkflow):
 
     def sketch(self):
         return {
-            'abcde': _abcde_stringify((self.id, None, None, None, ())),
+            'abcde': concat_abcde((self.id, None, None, None, ())),
             'percent': self.percent(),
             'branches': [branch.sketch() for branch in self.branches],
             'status': self.status(),
@@ -382,10 +382,10 @@ class Workflow(BaseWorkflow):
         a, b, c, d, e = dbg.flow.abcde
 
         assert a == self.id
-        requests = []
+        nodes = []
         for stage in self.branches[b]:
-            requests.extend([node for node in stage if node.name == name])
-        return requests
+            nodes.extend([node for node in stage if node.name == name])
+        return nodes
 
     def prev_stage(self, abcde):
         a, b, c, d, e = abcde
@@ -431,6 +431,9 @@ class Workflow(BaseWorkflow):
         all_node = []
         _every(self.branches)
         return all_node
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__} {len(self.branches)}: a={self.id} status={self.status()}>'
 
 
 def factor_request(request,

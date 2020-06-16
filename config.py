@@ -13,9 +13,8 @@ REGISTERED_SCRIPT = {
 
 # 用户配置
 BASIC_CONFIG = {
-    # 'preload': True,
-    'safe_script': False,
-    'storage_dir': '',
+    'trust_unverified': False,
+    'storage_dir': 'mp4',
     'tempdir': 'temp',
     'auto_select': True,
     'to_format': '.mp4',
@@ -31,7 +30,7 @@ SCRIPT_CONFIG = {
         'cookies': '',
         'proxies': None,
         'active_version': None,
-        'selection_rule': 1,
+        'selection_rule': 100,
         'to_format': ['.mp4'],
         'starter': ['start'],
         'append': ['convert', 'cleanup'],
@@ -123,7 +122,7 @@ def new_script_config():
         'cookies': '',
         'proxies': None,
         'active_version': None,
-        'selection_rule': 1,
+        'selection_rule': 100,
         'to_mimetype': ['.mp4'],
         'starter': ['start'],
         'append': ['convert', 'cleanup'],

@@ -1,7 +1,7 @@
 {
     "basic": {
-        "safe_script": false,
-        "storage_dir": "",
+        "trust_unverified": false,
+        "storage_dir": "mp4",
         "tempdir": "temp",
         "auto_select": true,
         "to_format": ".mp4",
@@ -69,7 +69,7 @@
             "cookies": "",
             "proxies": null,
             "active_version": null,
-            "selection_rule": 1,
+            "selection_rule": 100,
             "to_format": [
                 ".mp4"
             ],

@@ -72,22 +72,6 @@ class Bilibili(ScriptBaseClass):
         self.html_res = None
         self.html_parse = None
 
-    def fast_get(self):
-        """ 快速粗略获取必要的数据。
-        至少上传数据:
-            title:  处理的标题
-        """
-        html_res = self.request_get(self.url, headers=dict(headers))
-        # 汇报处理情况。
-        if html_res.status_code != 200:
-            dbg.error('%s %s: %s' % (html_res.status_code, html_res.reason, html_res.url))
-        else:
-            dbg.success('%s %s: %s' % (html_res.status_code, html_res.reason, html_res.url))
-
-        # 上传标题
-        html_parse = bs4.BeautifulSoup(html_res.text, features='html.parser')
-        dbg.upload(title=html_parse.find('h1').text)
-
     def run(self):
         html_res = self.request_get(self.url, headers=dict(headers))
         # 汇报处理情况。
@@ -254,6 +238,7 @@ if __name__ == '__main__':
     # 重载基类
     from script.base import ScriptBaseClass
 
-    bilibili = Bilibili.test('https://www.bilibili.com/video/av91721893', 100)
+    # bilibili = Bilibili.test('https://www.bilibili.com/video/av91721893', 100)
+    bilibili = Bilibili.test('https://www.bilibili.com/video/BV167411E7Tn', 100)
     # bilibili = Bilibili.test('https://www.bilibili.com/video/BV1sK411p7vg', 100)
     print(bilibili)

@@ -1,6 +1,8 @@
 
 from _request import (Option, Optional, requester, Request, _is_related_types, RE_VALID_PATHNAME)
+from utils import concat_abcde, mktemp
 from script import select_script, supported_script, get_script
+from config import get_basic
 from nbdler import Request as DlRequest, dlopen, HandlerError
 from subprocess import list2cmdline
 from nbdler.uri import URIs
@@ -8,6 +10,9 @@ from debugger import dbg
 import asyncio
 import shutil
 import os
+import re
+
+TEMP_PREFIX = re.compile(r'(?:(?:\d+)-)*\d+')
 
 
 def next_script(url, descriptions=None, **kwargs):
@@ -33,7 +38,7 @@ async def convert():
     if not results:
         # 对于没有经过ffmpeg处理的工具，默认将下载的音频资源全经过
         downloads = dbg.flow.find_by_name('download')
-        for filename in [download.get_data('pathname') for download in downloads]:
+        for filename in [dl.get_data('pathname') for dl in downloads]:
             converter = ffmpeg.convert(filename)
             node = dbg.flow.attach_node(converter)
             result = await node.start_request()
@@ -41,9 +46,19 @@ async def convert():
 
     # 修改文件名并移动文件
     storage_dir = dbg.root_info['storage_dir']
+    # 当文件多于一个的时候在存储目录添加一级目录
+    new_dir = os.path.join(os.path.realpath(storage_dir), dbg.root_info['title'])
+    n = dbg.root_info['n']
+    if n > 1:
+        if not os.path.isdir(new_dir):
+            os.mkdir(new_dir)
+        storage_dir = new_dir
+
     for pathname in results:
         path, name = os.path.split(pathname)
         dst_name = name.split('.', 1)[-1]
+        if n > 1:
+            dst_name = f'{dbg.flow.b:03}.{dst_name}'
         dst_pathname = os.path.join(os.path.realpath(storage_dir), dst_name)
         shutil.move(pathname, dst_pathname)
 
@@ -52,18 +67,29 @@ async def convert():
 async def cleanup():
     if dbg.root_info['remove_tempdir']:
         tempdir = dbg.root_info['tempdir']
-        shutil.rmtree(tempdir)
+        tempfiles = []
+        cur_b = dbg.flow.b
+        for name in os.listdir(tempdir):
+            rex = TEMP_PREFIX.search(name)
+            if not rex:
+                continue
+            a, b, c, d, *e = rex.group(0).split('-')
+            if int(b) == cur_b:
+                tempfiles.append(os.path.join(tempdir, name))
+
+        for tempfile in tempfiles:
+            try:
+                os.unlink(tempfile)
+            except:
+                pass
 
 
 @requester('download', bases_cls=(Request, URIs), sketch_data=('size', ), weight=2)
 async def download(**kwargs):
     self = dbg.__self__
-    # '[32-0-01-9].example'
-    a, b, c, d, e = dbg.flow.abcde
-    name = f'[{"-".join([f"{_:02}" for _ in [a, b, c, d]])}].{dbg.root_info["title"]}'
-    path = dbg.root_info['tempdir']
-    file_path = os.path.join(path, name)
-    rq = DlRequest(file_path=file_path, max_retries=dbg.config['max_retries'])
+
+    temp = mktemp()
+    rq = DlRequest(file_path=temp.pathname, max_retries=dbg.config['max_retries'])
     for uri in self.dumps():
         uri.pop('id')
         rq.put(**uri)
@@ -130,12 +156,7 @@ async def ffmpeg(inputs, callable_cmd, **kwargs):
 
     time_length = dbg.root_info.get_data('length', None)
 
-    # '[32-0-01-9].example'
-    a, b, c, d, e = dbg.flow.abcde
-    name = f'[{"-".join([f"{_:02}" for _ in [a, b, c, d, *e]])}].{dbg.root_info["title"]}'
-    path = dbg.root_info['tempdir']
-
-    file_path = os.path.join(path, name + dbg.root_info['to_format'])
+    temp = mktemp(dbg.root_info['to_format'])
 
     inputs = inputs
     if not isinstance(inputs, (list, tuple, set)):
@@ -143,7 +164,7 @@ async def ffmpeg(inputs, callable_cmd, **kwargs):
 
     cmd = callable_cmd(
         inputs=[input2pathname(input) for input in inputs],
-        output=file_path,
+        output=temp.pathname,
         **kwargs
     )
 
@@ -170,7 +191,7 @@ async def ffmpeg(inputs, callable_cmd, **kwargs):
 
     dbg.upload(
         cmd=cmd,
-        pathname=file_path
+        pathname=temp.pathname
     )
 
     await _ffmpeg.run(timeout=dbg.config.get('timeout', None))
@@ -211,20 +232,19 @@ def script_request(url, rule=None, script=None, *, discard_next=False, **kwargs)
                            script.name,
                            title)
     tempdir = os.path.realpath(tempdir)
-    if not os.path.isdir(tempdir):
-        os.mkdir(tempdir)
 
-    storage_dir = os.path.join(script_config['storage_dir'], script.name)
+    storage_dir = os.path.join(get_basic('storage_dir'), script_config['storage_dir'], script.name)
 
+    items = dbg.get_data('items', [])
     dbg.upload(
         title=title,
         tempdir=tempdir,
         storage_dir=storage_dir,
         remove_tempdir=script_config.get('remove_tempdir', True),
-        to_format=script_config.get('to_format', ['.mp4'])[0]
-
+        to_format=script_config.get('to_format', ['.mp4'])[0],
+        n=len(items),
     )
 
-    return dbg.get_data('items', [])
+    return items
 
 

@@ -3,13 +3,13 @@ import os
 from contextlib import contextmanager
 from typing import Optional
 import json
-
+from collections import namedtuple
 import jscaller
 from requests.cookies import RequestsCookieJar, create_cookie
 from threading import Thread
 from datetime import datetime
 from asyncio import tasks
-
+from debugger import dbg
 from config import get_config, SECTION_WORKER
 
 NoneType = type(None)
@@ -42,9 +42,7 @@ def run_forever(function, *args, name=None, **kwargs):
 
 
 def cancel_all_tasks(loop):
-    """ 关闭循环中剩余的所有任务。 """
-    # source from asyncio.runners._cancel_all_tasks
-
+    """ 关闭循环中剩余的所有任务。 asyncio.runners._cancel_all_tasks"""
     to_cancel = tasks.all_tasks(loop)
     if not to_cancel:
         return
@@ -237,3 +235,16 @@ def js_session(source, timeout=None, engine=None):
         return result
 
 
+TemporaryFile = namedtuple('TemporaryFile', 'path name pathname nameonly ext')
+
+
+def mktemp(ext=''):
+    nameonly = f'[{concat_abcde(dbg.flow.abcde)}].{dbg.root_info["title"]}'
+    name = nameonly + ext
+    path = dbg.root_info['tempdir']
+    return TemporaryFile(path, name, os.path.join(path, name), nameonly, ext)
+
+
+def concat_abcde(abcde, sep='-'):
+    *abcd, e = abcde
+    return sep.join([str(i) for i in abcd + list(e) if i is not None])

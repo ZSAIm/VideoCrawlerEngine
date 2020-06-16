@@ -514,11 +514,6 @@ class RootRequest(Request):
         raise NotImplementedError
 
 
-def _abcde_stringify(abcde, sep='-'):
-    *abcd, e = abcde
-    return sep.join([str(i) for i in abcd + list(e) if i is not None])
-
-
 def _all_status(iteration):
     status = REQ_DONE
     for i in iteration:

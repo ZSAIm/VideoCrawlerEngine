@@ -7,6 +7,9 @@ from requester.request import script_request, requester
 from script import select_script, supported_script
 from workflow import factor_request, Workflow, run_workflow, PendingWorkflow, BrokenWorkflow
 from traceback import format_exc
+import shutil
+import os
+
 
 CODE_SUCCESS = 0
 CODE_EXISTED = -2
@@ -49,7 +52,6 @@ class Task:
 
 def new_task(url, rule=None, **kwargs):
     global tasks
-
     key = md5(url.encode('utf-8')).hexdigest()
     code = CODE_SUCCESS
     if key in tasks:
@@ -137,6 +139,11 @@ async def task_request(url, rule, **kwargs):
         with dbg.run(srp_req) as d:
             d.upload(**desc)
 
+        # 创建临时目录
+        tempdir = srp_req.get_data('tempdir')
+        if not os.path.isdir(tempdir):
+            os.mkdir(tempdir)
+
         await work_queue.put(workflow)
 
         # 初始标题作为主标题
@@ -168,12 +175,20 @@ async def task_request(url, rule, **kwargs):
 
         return status
 
-    def _task_done_cb(future):
+    def _task_done_cb(f):
+        """ 任务完成回调，用于判断是否所有工作流已完成或发生错误。
+        任意一个工作流还在工作中都不会停止任务执行。
+        """
         nonlocal work_queue, stopped
         work_queue.task_done()
-
         if stopped or not any([flow.status() in (REQ_QUEUING, REQ_RUNNING) for flow in flows]):
             work_queue.put_nowait(None)
+
+            # 如果工作流成功执行完，则清除改任务的临时目录
+            if isinstance(f.task, Workflow):
+                if f.task.status() == REQ_DONE:
+                    tempdir = f.task.root.get_data('tempdir')
+                    shutil.rmtree(tempdir, ignore_errors=True)
 
     def _stopper():
         nonlocal stopped
@@ -211,4 +226,7 @@ async def task_request(url, rule, **kwargs):
             continue
 
         fut = asyncio.run_coroutine_threadsafe(coro, loop=loop)
+        # 携带协程任务对象，以便回调使用
+        fut.task = task
         fut.add_done_callback(_task_done_cb)
+
