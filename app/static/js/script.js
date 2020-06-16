@@ -58,6 +58,20 @@ $(function(){
         })
     }
 
+    function getConfigInfo(){
+        $.ajax({
+            type:'GET',
+            url:'./configInfo',
+            cache: false,
+            dataType:'json',
+            success: function(data){
+                console.log('Not Implemented');
+            },
+            error: function(){
+            }
+        })
+    }
+
     function getTaskListInfo(){
         $.ajax({
             type:'GET',
@@ -78,7 +92,7 @@ $(function(){
 
     function updateTask(key, data){
         var taskNode = $('#Task-' + key);
-        taskNode.length == 0 && addNewTask({'key': key, 'url': data.url});
+        taskNode.length == 0 && (addNewTask({'key': key, 'url': data.url}), taskNode = $('#Task-' + key));
         // 更新主标题
         data.title && taskNode.find('.task-title').text(data.title);
 

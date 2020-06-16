@@ -24,9 +24,13 @@
             <span class="navbar-toggler-icon"></span>
         </button>
     <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        <ul class="navbar-nav">
+        <ul class="nav navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" data-target="#submitModal" data-toggle="modal" href="#">新建
+                <a class="nav-link active" data-target="#submitModal" data-toggle="modal" href="#">新建
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#settings_content">设置
                 </a>
             </li>
         </ul>
@@ -40,10 +44,17 @@
 
 {% block content %}
 <div class="container">
-    <div class="container-list">
-    {% block task_content %}
+    <div class="tab-content">
+        <div id="task_content" class="container content tab-pane active">
+        {% block task_content %}
 
-    {% endblock task_content %}
+        {% endblock task_content %}
+        </div>
+        <div id="settings_content" class="container content tab-pane">
+        {% block settings_content %}
+
+        {% endblock settings_content %}
+        </div>
     </div>
 </div>
 {% block modal %}

@@ -24,9 +24,7 @@ ul.tasks li.task {
 ul.tasks li.task:hover {
     background-color: #f0f0f0;
 }
-div.task-date {
-    float: right;
-}
+
 div.task-body {
     font-size: 12px;
     color: #6c757d;
@@ -82,8 +80,51 @@ div.task-content {
     height: 100%;
 
 }
-.container .container-list {
+.container .tab-content {
     height: 100%;
     width: 100%;
 }
 
+#task_content {
+    padding-top: 16px;
+    margin-left: 0px;
+}
+
+div.settings {
+    height: 100%;
+}
+
+.settings-pane {
+    overflow-y: scroll;
+    height: 100%
+}
+.settings-pane h1 {
+    padding-top: 20px;
+    padding-bottom: 13px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+.settings-pane .form-inline label {
+    padding-left: 5px;
+    display: unset;
+}
+
+.settings-nav {
+    float: left;
+    height: 100%;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.settings-nav nav {
+    padding-left: 0px;
+    padding-right: 0px;
+    width: 100%;
+}
+.settings-nav nav ul {
+    margin-right: 12px;
+    width: 100%;
+}
+.settings-nav ul li a.active {
+    background-color: #dedede;
+
+}

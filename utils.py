@@ -239,6 +239,7 @@ TemporaryFile = namedtuple('TemporaryFile', 'path name pathname nameonly ext')
 
 
 def mktemp(ext=''):
+    """ 生成当前工作流节点的临时文件路径名称。"""
     nameonly = f'[{concat_abcde(dbg.flow.abcde)}].{dbg.root_info["title"]}'
     name = nameonly + ext
     path = dbg.root_info['tempdir']

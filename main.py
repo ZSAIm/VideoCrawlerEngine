@@ -14,7 +14,7 @@ if __name__ == '__main__':
     flask_app.config['SECRET_KEY'] = '66666666666'
     init_scripts()
     init_workers()
-    flask_app.run(port=2333, debug=False)
+    flask_app.run(port=2333, debug=True)
     task.stop_all()
     worker.shutdown()
 

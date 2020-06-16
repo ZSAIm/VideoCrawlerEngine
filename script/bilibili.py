@@ -15,18 +15,10 @@ import json
 import re
 
 re_playinfo = re.compile(
-    r'<script>'
-    r'(?:[(?:\s/\*).*?(?:\*/)\s])*'
-    r'window\.__playinfo__(?:[(?:\s/\*).*?(?:\*/)\s])*=(?:[(?:\s/\*).*?(?:\*/)\s])*'
-    r'(.*?)'
-    r'</script>')
+    r'<script>.*?window\.__playinfo__\s*=(?:[(?:\s/\*).*?(?:\*/)\s])*(.*?)</script>')
+
 re_initial_state = re.compile(
-    r'<script>'
-    r'(?:[(?:\s/\*).*?(?:\*/)\s])*'
-    r'window\.__INITIAL_STATE__(?:[(?:\s/\*).*?(?:\*/)\s])*=(?:[(?:\s/\*).*?(?:\*/)\s])*'
-    r'(.*?)'
-    r'(?:[(?:\s/\*).*?(?:\*/)\s])*;.*?'
-    r'</script>')
+    r'<script>.*?window\.__INITIAL_STATE__\s*=(.*?);(\(function\s*\(\s*\)\s*\{.*?)?</script>')
 
 dash_params = {
     'avid': None,
@@ -65,7 +57,7 @@ class Bilibili(ScriptBaseClass):
     author = 'ZSAIM'
     created_date = '2020/03/05'
 
-    supported_domains = ['bilibili.com']
+    supported_domains = ['www.bilibili.com']
     quality_ranking = [116, 80, 74, 64, 32, 16]
 
     def _init(self):
@@ -122,10 +114,6 @@ class Bilibili(ScriptBaseClass):
             result = self.api_playurl(request_params)
             results.append(Optional(result))
 
-        # results.append(
-        #     next_script('https://www.bilibili.com/video/BV15Z4y1x7uk', rule=1, quality=self.quality)
-        # )
-
         dbg.upload(items=results)
 
     def api_playurl(self, request_params):
@@ -155,7 +143,10 @@ class Bilibili(ScriptBaseClass):
                 item_req = ffmpeg.concat_av([video_dl, audio])
 
                 frame_rate = v['frame_rate'].split('/')
-                frame_rate = int(frame_rate[0]) / int(frame_rate[1])
+                if len(frame_rate) > 1:
+                    frame_rate = int(frame_rate[0]) / int(frame_rate[1])
+                else:
+                    frame_rate = frame_rate[0]
                 size = None
                 video_desc = {
                     'length': time_length,
@@ -218,7 +209,6 @@ class Bilibili(ScriptBaseClass):
         # 解析 window.__playinfo__
         res_playinfo = re_playinfo.search(html_res.text)
         if res_playinfo is None:
-            # dbg.error('')
             raise ValueError(res_playinfo)
         playinfo = json.loads(res_playinfo.group(1))
         return playinfo
@@ -228,7 +218,6 @@ class Bilibili(ScriptBaseClass):
         # 解析 window.__INITIAL_STATE__
         res_initial_state = re_initial_state.search(html_res.text)
         if re_initial_state is None:
-            # dbg.error('')
             raise ValueError(re_initial_state)
         initial_state = json.loads(res_initial_state.group(1))
         return initial_state
@@ -239,6 +228,7 @@ if __name__ == '__main__':
     from script.base import ScriptBaseClass
 
     # bilibili = Bilibili.test('https://www.bilibili.com/video/av91721893', 100)
-    bilibili = Bilibili.test('https://www.bilibili.com/video/BV167411E7Tn', 100)
+    # bilibili = Bilibili.test('https://www.bilibili.com/video/BV167411E7Tn', 100)
     # bilibili = Bilibili.test('https://www.bilibili.com/video/BV1sK411p7vg', 100)
+    bilibili = Bilibili.test('https://www.bilibili.com/video/BV14p4y1D7r7', 100)
     print(bilibili)

@@ -8,4 +8,5 @@ class NewSubmitForm(FlaskForm):
     urls = TextAreaField('urls', validators=[DataRequired()])
 
 
-
+class SettingsConfigForm(FlaskForm):
+    urls = TextAreaField('urls', validators=[DataRequired()])
