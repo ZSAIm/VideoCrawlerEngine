@@ -1,80 +1,66 @@
 
+
+from contextmgr import ContextManager
 from contextlib import contextmanager
-from contextvars import ContextVar
-from config import get_config, SECTION_WORKER
-from functools import partial
+
+__scope__ = ContextManager('__scope__')
+
+__debug_mode__ = False
+__path__ = None
 
 
-def _not_impl():
-    raise NotImplementedError
+@contextmanager
+def run(context):
+    """ 运行"""
+    global __scope__
+    with __scope__.enter(context):
+        yield __scope__
 
 
-class RequestDebugger(object):
-    """ 脚本调试工具 """
-    __slots__ = ()
-
-    __set_debug__ = False
-
-    __ctx__ = ContextVar('debugger', default=None)
+class DebugChain:
+    def __init__(self, prename, name):
+        self.__prename__ = prename
+        self.__name__ = name
 
     def __getattr__(self, item):
+        prename = [self.__prename__] if self.__prename__ else []
+        obj_chain = f'{".".join(prename + [self.__name__, item])}'
         try:
-            return self.__ctx__.get()[item]
-        except:
-            _not_impl()
+            obj = _lookup_scope(obj_chain)
+            return obj
+        except (KeyError, LookupError):
+            return DebugChain(f'{".".join(prename + [self.__name__])}', item)
 
-    @contextmanager
-    def run(self, request_task, context=None):
-        """
-        Context:
-            startupinfo:
-            root_info:
-            flow:
-            config:
-            name:
-            __self__: request_task
-        """
-        def _get_dbg_context(name, default=None):
-            try:
-                return getattr(dbg, name, None)
-            except NotImplementedError:
-                return default
+    def __repr__(self):
+        prename = [self.__prename__] if self.__prename__ else []
+        return f'<DebugChain {".".join(prename + [self.__name__])}>'
 
-        if context is None:
-            context = {}
-
-        context.update(_export_progress(request_task.progress))
-        startupinfo = {
-            'name': _get_dbg_context('name'),
-        }
-        context.update({
-            'error_handler': request_task.error_handler,
-            'name': request_task.name,
-            'config': get_config(SECTION_WORKER, request_task.name),
-            'startupinfo': startupinfo,
-            '__self__': request_task,
-        })
-        token = self.__ctx__.set(context)
-        yield self
-        self.__ctx__.reset(token)
-
-    __bases__ = (object,)
+    def __len__(self):
+        return len(__scope__.get())
 
 
-# 脚本的调试工具
-dbg = RequestDebugger()
+def __getattr__(name):
+    try:
+        return _lookup_scope(name)
+    except (KeyError, LookupError):
+        return DebugChain('', name)
 
 
-def _export_progress(progress):
-    exports = {}
-    for attr in progress.EXPORT_ATTR:
-        exports[f'set_{attr}'] = partial(progress.__setattr__, attr)
+def _lookup_scope(chain):
+    return __scope__[chain]
 
-    for attr in progress.EXPORT_ATTR:
-        exports[f'get_{attr}'] = partial(getattr, progress, attr)
 
-    for meth in progress.EXPORT_METH:
-        exports[meth] = getattr(progress, meth)
+@contextmanager
+def run_in_debug_mode(**options):
+    from worker import init_workers
+    from config import load_config
+    from flow import TaskStack
 
-    return exports
+    global __debug_mode__
+    load_config()
+    init_workers()
+    __debug_mode__ = True
+
+    task = TaskStack(None)
+    yield task
 

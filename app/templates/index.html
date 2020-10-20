@@ -5,13 +5,17 @@
 {% block title %}Flasky{% endblock %}
 
 {% block task_content %}
-    {% include '_task.html' with context %}
+    {% include '_task.html' %}
 {% endblock task_content %}
 
 {% block settings_content %}
-    {% include '_settings.html' with context %}
+    {% include '_settings.html' %}
 {% endblock settings_content %}
 
+{% block worker_content %}
+    {% include '_worker.html' %}
+{% endblock worker_content %}
+
 {% block modal %}
-    {% include '_modal.html' with context %}
+    {% include '_modal.html' %}
 {% endblock %}

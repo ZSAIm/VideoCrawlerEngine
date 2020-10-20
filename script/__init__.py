@@ -1,10 +1,11 @@
 
-from config import REGISTERED_SCRIPT, new_script_config, get_script_config
+from config import REGISTERED_SCRIPT, new_script_config, script_config
 from urllib.parse import urlparse
 import requests, bs4
-from utils import utility_package, split_name_version
+from uitls import split_name_version, utility_package
 from collections import defaultdict
-from debugger import dbg
+from contextmgr import context_dict
+import debugger as dbg
 import os
 
 
@@ -15,31 +16,32 @@ class ScriptBaseClass(object):
     def test(cls, url, rule=None, config=None, *args, **kwargs):
         """ 构建脚本调试环境，并调用脚本的run方法，
         最后返回由该脚本构成的脚本请求ScriptRequest。"""
-        from config import new_script_config, get_script_config
+        from config import new_script_config, script_config
         from .base import ScriptBaseClass
         from requester.request import script_request
+        from requester.base import enter_request_context
 
         class TestScript(cls, ScriptBaseClass):
             # 继承base.py基类
             pass
 
         if config is None:
-            config = get_script_config(TestScript.name) or new_script_config()
+            config = script_config(TestScript.name) or new_script_config()
 
         script = ScriptTask(TestScript, config)
         # 打开调试模式
         # dbg.__set_debug__ = True
-        script_request = script_request(url, rule=rule, script=script)
-        with dbg.run(script_request):
+        request = script_request(url, rule=rule, script=script)
+        with enter_request_context(request), dbg.run(context_dict()):
             dbg.start()
-            result = script_request.end_request()
+            result = request.end_request()
             dbg.task_done()
             dbg.close()
-        return script_request
+        return request
 
 
 # 已编译的脚本仓库
-script_stores = {}
+repository = {}
 
 # 注册的域
 # 'example.com': 'name-version'
@@ -110,7 +112,7 @@ class Scripts:
         self.name = name
         self.scripts = {}
         self._active = None
-        self.config = get_script_config(self.name) or new_script_config()
+        self.config = script_config(name) or new_script_config()
 
     @property
     def supported_domains(self):
@@ -185,7 +187,7 @@ def compile_script(script_name, verify=True):
         print_exc()
         return err
     else:
-        global script_stores, registered_domains, ScriptBaseClass
+        global repository, registered_domains, ScriptBaseClass
         # 从脚本中提取爬虫继承类。
         for k, v in scope.items():
             try:
@@ -193,9 +195,9 @@ def compile_script(script_name, verify=True):
                     if not v.name:
                         continue
                     # 保存编译的脚本
-                    if v.name not in script_stores:
-                        script_stores[v.name] = Scripts(v.name)
-                    script_stores[v.name].install(v)
+                    if v.name not in repository:
+                        repository[v.name] = Scripts(v.name)
+                    repository[v.name].install(v)
 
                     # DOC: https://docs.python.org/zh-cn/3.7/library/stdtypes.html#code-objects
                     # 代码对象被具体实现用来表示“伪编译”的可执行 Python 代码，例如一个函数体。
@@ -213,7 +215,7 @@ def compile_script(script_name, verify=True):
 def select_script(scripts):
     """ 该方法会返回列表中优先级最高的脚本。"""
     def latest_version(name_version):
-        return (get_script_config(split_name_version(name_version)[0]) or {'order': 0})['order']
+        return (script_config(split_name_version(name_version)[0]) or {'order': 0})['order']
     return max(scripts, key=latest_version)
 
 
@@ -227,7 +229,7 @@ def get_script(script_name, version=None):
     if _version is not None:
         version = _version
 
-    script = script_stores.get(name, None)
+    script = repository.get(name, None)
     if not script:
         # 没有找到指定名称的脚本。
         return None
@@ -236,7 +238,7 @@ def get_script(script_name, version=None):
 
 def get_versions(script_name):
     """ 返回指定名称脚本含有的所有版本。"""
-    versions = script_stores.get(script_name, None)
+    versions = repository.get(script_name, None)
     if not versions:
         return None
     return sorted(versions, reverse=True)
@@ -273,13 +275,13 @@ def init_scripts():
     # 初始化爬虫脚本基类
     compile_script('base.py', verify=False)
     # 更新base.py的默认使用版本
-    version = get_script_config('base')['active_version']
+    version = script_config('base')['active']
     try:
         version = float(version)
     except (TypeError, ValueError):
         version = None
     if version is not None:
-        script_stores['base'].active(version)
+        repository['base'].active(version)
     # 准备脚本基类。
     ScriptBaseClass = get_script('base').script_cls
     supplied_utilities['ScriptBaseClass'] = ScriptBaseClass
@@ -289,10 +291,12 @@ def init_scripts():
         compile_script(script, False)
 
     # 加载脚本配置
-    for k, v in get_script_config().items():
-        script = script_stores.get(k, None)
+    for k, v in script_config().items():
+        if k is None or k == 'null':
+            continue
+        script = repository.get(k, None)
         try:
-            active_version = float(v['active_version'])
+            active_version = float(v['active'])
         except (TypeError, ValueError):
             active_version = None
         if script and active_version is not None:

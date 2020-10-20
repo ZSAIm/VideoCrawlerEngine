@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField
+from wtforms import TextAreaField, StringField
 from wtforms.validators import DataRequired
 
 
@@ -9,4 +9,5 @@ class NewSubmitForm(FlaskForm):
 
 
 class SettingsConfigForm(FlaskForm):
-    urls = TextAreaField('urls', validators=[DataRequired()])
+    tempdir = StringField('tempdir', validators=[DataRequired()])
+    storage_dir = StringField('storage_dir', validators=[DataRequired()])

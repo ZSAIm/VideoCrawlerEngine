@@ -75,8 +75,8 @@ div.task-content {
     padding-left: 0px;
     margin-right: 0px;
     margin-left: 10px;
-    padding-top: 66px;
-    margin-top: -20px;
+    padding-top: 44px;
+    margin-top: -15px;
     height: 100%;
 
 }
@@ -85,20 +85,20 @@ div.task-content {
     width: 100%;
 }
 
-#task_content {
-    padding-top: 16px;
+#task-content {
+    padding-top: 30px;
     margin-left: 0px;
 }
 
-div.settings {
+div.settings, div.worker {
     height: 100%;
 }
 
-.settings-pane {
+.settings-pane, .worker-pane{
     overflow-y: scroll;
     height: 100%
 }
-.settings-pane h1 {
+.settings-pane h1 , .worker-pane h1{
     padding-top: 20px;
     padding-bottom: 13px;
     margin-bottom: 20px;
@@ -109,22 +109,22 @@ div.settings {
     display: unset;
 }
 
-.settings-nav {
+.settings-nav, .worker-nav{
     float: left;
     height: 100%;
     padding-left: 0px;
     padding-right: 0px;
 }
-.settings-nav nav {
+.settings-nav nav, .worker-nav nav{
     padding-left: 0px;
     padding-right: 0px;
     width: 100%;
 }
-.settings-nav nav ul {
+.settings-nav nav ul, .worker-nav nav ul{
     margin-right: 12px;
     width: 100%;
 }
-.settings-nav ul li a.active {
+.settings-nav ul li a.active, .worker-nav ul li a.active{
     background-color: #dedede;
 
 }

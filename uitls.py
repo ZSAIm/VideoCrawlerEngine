@@ -1,15 +1,14 @@
-import asyncio
-import os
-from contextlib import contextmanager
-from typing import Optional
 import json
-from collections import namedtuple
+import os
+import re
+from asyncio import tasks
+from contextlib import contextmanager
+from datetime import datetime
+from threading import Thread
+
 import jscaller
 from requests.cookies import RequestsCookieJar, create_cookie
-from threading import Thread
-from datetime import datetime
-from asyncio import tasks
-from debugger import dbg
+
 from config import get_config, SECTION_WORKER
 
 NoneType = type(None)
@@ -114,7 +113,7 @@ def json_stringify(source,
                    replace=None,
                    keys=(float('nan'), float('inf'), float('-inf')),
                    indent=None):
-    """ 处理非标准JSON的格式化问题。"""
+    """ 处理非标准JSON的格式化问题。由于python内置的json会对nan, inf, -inf进行处理，这会造成非标准的JSON。"""
     def check_dict(o):
         return {go_check(k): go_check(v) for k, v in o.items()}
 
@@ -146,67 +145,6 @@ utility_package = {
 }
 
 
-class PipeStreamHandler:
-    def __init__(self, process):
-        self.process = process
-
-    @property
-    def stdin(self):
-        return self.process.stdin
-
-    @property
-    def stdout(self):
-        return self.process.stdout
-
-    @property
-    def stderr(self):
-        return self.process.stderr
-
-    async def feed_data(self, data: Optional[bytes]):
-        self.stdin.write(data)
-        await self.stdin.drain()
-
-    async def _stream_handler(self, stream_id, line):
-        raise NotImplementedError
-
-    async def run(self, input=None, close_after_feed=True, timeout=None):
-        async def _stream_reader(fd, stream_id):
-            nonlocal stream_getter
-            while True:
-                line = await fd.readline()
-                if not line:
-                    break
-                await stream_getter.put((stream_id, line))
-            fd._transport.close()
-            await stream_getter.put(None)
-
-        async def _stream_handler():
-            nonlocal stream_getter
-
-            while True:
-                data = await stream_getter.get()
-                if data is None:
-                    if _is_all_closed():
-                        break
-                else:
-                    await self._stream_handler(*data)
-
-        def _is_all_closed():
-            return self.stdout._transport.is_closing() and \
-                   self.stderr._transport.is_closing()
-
-        if input:
-            await self.feed_data(input)
-        if close_after_feed:
-            self.stdin.close()
-
-        stream_getter = asyncio.Queue()
-        return await asyncio.wait([
-            _stream_handler(),
-            _stream_reader(self.stdout, 1),
-            _stream_reader(self.stderr, 2)], timeout=timeout)
-
-
 @contextmanager
 def js_session(source, timeout=None, engine=None):
     from requester.request import jsruntime
@@ -235,17 +173,4 @@ def js_session(source, timeout=None, engine=None):
         return result
 
 
-TemporaryFile = namedtuple('TemporaryFile', 'path name pathname nameonly ext')
-
-
-def mktemp(ext=''):
-    """ 生成当前工作流节点的临时文件路径名称。"""
-    nameonly = f'[{concat_abcde(dbg.flow.abcde)}].{dbg.root_info["title"]}'
-    name = nameonly + ext
-    path = dbg.root_info['tempdir']
-    return TemporaryFile(path, name, os.path.join(path, name), nameonly, ext)
-
-
-def concat_abcde(abcde, sep='-'):
-    *abcd, e = abcde
-    return sep.join([str(i) for i in abcd + list(e) if i is not None])
+REG_VALID_PATHNAME = re.compile(r'[\\/:*?"<>|\r\n]+')

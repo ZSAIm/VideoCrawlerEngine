@@ -1,38 +1,49 @@
 from functools import wraps, partial
 from inspect import getfullargspec, iscoroutinefunction
-
-from context import impl_ctx
-from utils import current_time
+from contextmgr import context_dict
+from contexts import PROGRESS_CONTEXT, REQUEST_CONTEXT, WORKER_CONFIG_CONTEXT
+from uitls import current_time
 from worker import get_worker
+from config import get_config, SECTION_WORKER
 from traceback import format_exc
+from contextlib import contextmanager
+from traceback import print_exc
 import threading
-from queue import Queue
-import re
+
+
+@contextmanager
+def enter_request_context(request):
+    with PROGRESS_CONTEXT.enter(request.progress), \
+         REQUEST_CONTEXT.enter(request), \
+         WORKER_CONFIG_CONTEXT.enter(dict(get_config(SECTION_WORKER, request.NAME))):
+        yield
 
 
 class Request:
     """ Request 请求对象是用来描述从脚本的开始到完成过程中的处理方式。
     name:           请求名称
-
-
     """
-    name = None
+    NAME = None
 
     WEIGHT = 1
-    __simple__ = None
+    SIMPLE = None
+
+    __locale__ = ()
 
     @property
     def progress(self):
         return self.__progress__
 
     def start_request(self, context=None):
-        if context is None:
-            context = {}
+        with enter_request_context(self):
+            ctx = context_dict()
+            if context is None:
+                context = {}
 
-        context = impl_ctx(context)
+            ctx.update(context)
 
-        self.progress.enqueue()
-        return get_worker(self.name).submit(self, context)
+            self.progress.enqueue()
+            return get_worker(self.NAME).submit(ctx)
 
     def end_request(self):
         """ 结束请求。"""
@@ -46,25 +57,14 @@ class Request:
         """ 异常处理。"""
         self.progress.error(format_exc())
 
-    def getresponse(self):
-        """ 返回响应 """
-        return self.__progress__.details()
-
     def get_data(self, name, default=None):
-        return self.__progress__.data.get(name, default)
+        result = self.__progress__.get_data(name, default)
+        # if callable(result):
+        #     result = result()
+        return result
 
-    def sketch(self):
-        sketch = self.__progress__.sketch()
-        sketch.update({
-            'name': self.name,
-        })
-        return sketch
-
-    def details(self, log=False):
-        return self.__progress__.details(log)
-
-    def stop(self):
-        return self.progress.stop()
+    async def stop(self):
+        return await get_worker('stop').submit(self.progress.stop)
 
     def __repr__(self):
         return f'<{self.__class__.__name__}>'
@@ -72,26 +72,24 @@ class Request:
     def __new__(cls, *args, **kwargs):
         inst = object.__new__(cls)
         inst.__progress__ = RequestProgress()
+
+        subs = search_requests(args)
+        subs.extend(search_requests(kwargs))
+        inst.__subrequest__ = tuple(subs)
         return inst
 
+    def __getitem__(self, item):
+        return self.get_data(item)
 
-def requester(request_name,
-              weight=1,
-              sketch_data=(),
-              bases_cls=None,
-              root=False,
-              auto_search=True):
+
+def requester(request_name, weight=1, root=False):
     """ 简单请求构建器。
     Args:
         request_name: 请求者名称
         weight: 当前请求器在百分比percent中所占的权重
-        sketch_data: 上传upload的数据中被sketch()返回的数据字段组成的列表。
-        bases_cls:
         root:
-        auto_search:
     """
     def wrapper(func):
-        nonlocal bases_cls
         argnames, varargs, varkw, defaults, kwonlyargs, kwonlydefaults, annotations = getfullargspec(func)
 
         @wraps(func)
@@ -121,24 +119,9 @@ def requester(request_name,
                 'args': args[narg:],
                 'kwargs': kwargs
             })
-            req = result(**kws)
+            req = request_class(**kws)
             req.end_request = _worker
-            if callable(initializer):
-                initializer(req)
-            if auto_search:
-                subs = _search_request(args)
-                subs.extend(_search_request(kwargs))
-                req.__subrequest__ = tuple(subs)
             return req
-
-        initializer = None
-
-        def wrapped_init(init_func):
-            nonlocal initializer
-            initializer = init_func
-            return init_func
-
-        wrapped.initializer = wrapped_init
 
         if iscoroutinefunction(func):
             async def inner_worker(*args, **kwargs):
@@ -158,41 +141,27 @@ def requester(request_name,
         def subrequest(self):
             return self.__subrequest__
 
-        if sketch_data:
-            def sketch(self):
-                sk = Request.sketch(self)
-                for k in sketch_data:
-                    sk[k] = self.get_data(k)
-                return sk
-        else:
-            sketch = Request.sketch
-
-        __name__ = f'{request_name.title()}Request'
+        __name__ = f'{request_name.title()}Requester'
 
         __slots__ = tuple(list(argnames) + kwonlyargs + ['args', 'kwargs'])
 
         class_namespace = {
-            'name': request_name,
-            'subrequest': subrequest,
-            'sketch': sketch,
+            'NAME': request_name,
             'WEIGHT': weight,
+            'SIMPLE': wrapped,
+            'subrequest': subrequest,
             '__slots__': __slots__,
             '__init__': __init__,
             '__repr__': __repr__,
             '__doc__': func.__doc__,
             '__subrequest__': (),
-            '__simple__': wrapped,
         }
 
-        if bases_cls is None:
-            bases_cls = []
         if root:
             bases = (RootRequest,)
         else:
             bases = (Request,)
-        if bases[0] not in bases_cls:
-            bases_cls = bases + tuple(bases_cls)
-        result = type(__name__, bases_cls, class_namespace)
+        request_class = type(__name__, bases, class_namespace)
 
         return wrapped
     return wrapper
@@ -204,9 +173,9 @@ def get_requester(name):
         name: 请求器名称
     """
     for req_cls in Request.__subclasses__():
-        if name == req_cls.name:
-            if req_cls.__simple__:
-                return req_cls.__simple__
+        if name == req_cls.NAME:
+            if req_cls.SIMPLE:
+                return req_cls.SIMPLE
             else:
                 return req_cls
     return None
@@ -216,7 +185,7 @@ def _is_related_types(obj):
     return isinstance(obj, (Request, Option, Optional))
 
 
-def _search_request(arg):
+def search_requests(arg):
     def _list_tuple_set(o):
         for v in o:
             if _is_related_types(v):
@@ -236,10 +205,9 @@ def _search_request(arg):
                 _do(v)
 
     def _do(o):
-        typ = type(o)
-        if typ in (list, tuple, set):
+        if isinstance(o, (list, tuple, set)):
             _list_tuple_set(o)
-        elif typ is dict:
+        elif isinstance(o, dict):
             _dict(o)
         elif _is_related_types(o):
             rs.append(o)
@@ -249,32 +217,46 @@ def _search_request(arg):
     return rs
 
 
+class Brake:
+    """ 请求制动器。"""
+    def __init__(self):
+        self.stopper_lst = []
+        self.sema = threading.Semaphore(0)
+
+    def run(self):
+        with self.sema:
+            for stopper in self.stopper_lst:
+                try:
+                    stopper()
+                except Exception:
+                    print_exc()
+
+    def add_stopper(self, stopper):
+        """ 仅允许非协程函数作为停止器。
+        如果是协程函数，使用functools.partial(asyncio.run, stopper())来实现
+        """
+        assert not iscoroutinefunction(stopper)
+        assert callable(stopper)
+        self.stopper_lst.append(stopper)
+        self.sema.release()
+
+    def destroy(self):
+        with self.sema._cond:
+            self.sema._value = float('inf')
+            self.sema._cond.notify_all()
+
+
 class RequestProgress:
-    EXPORT_ATTR = frozenset({
-        'percent', 'speed', 'timeleft', 'status'
-    })
-
-    EXPORT_METH = frozenset({
-        'upload', 'upload_default', 'start', 'close', 'task_done', 'get_data',
-        'error', 'success', 'info', 'warning', 'report', 'sketch', 'details', 'add_stopper'
-    })
-
-    __slots__ = ('data', 'logs', '_status', '_percent', '_speed', '_timeleft',
-                 '__worker__', '_stoppers', '_stoppers', '_closed', '_lock', '_started')
 
     def __init__(self):
         self.data = {}
         self.logs = []
-
         self._status = REQ_READY
         self._percent = 0
         self._speed = 0
         self._timeleft = float('inf')
-        self.__worker__ = None
-        self._stoppers = Queue()
-        self._lock = threading.Lock()
-        self._closed = False
-        self._started = False
+
+        self.brake = Brake()
 
     @property
     def status(self):
@@ -312,27 +294,30 @@ class RequestProgress:
     def timeleft(self, value):
         self._timeleft = value
 
-    def sketch(self):
-        return {
-            'percent': self.percent,
-            'status': self.status,
-            'speed': self.speed,
-            'timeleft': self.timeleft,
-            'latest': (self.logs and self.logs[-1]) or ''
-        }
+    def add_stopper(self, stopper):
+        """ 停止器。"""
+        self.brake.add_stopper(stopper)
 
-    def details(self, log=False):
-        data = {k: v() if callable(v) else v for k, v in self.data.items()}
-        info = self.sketch()
-        info.update({
-            'data': data,
-        })
-        if log:
-            info['logs'] = self.logs
-        return info
+    def stop(self):
+        """ """
+        if self.status in (REQ_RUNNING, REQ_QUEUING):
+            self.brake.run()
 
-    def get_data(self, key, default=None):
-        return self.data.get(key, default)
+    def get_data(self, key, default=None, ignore_safe=True):
+        result = self.data.get(key, default)
+        if isinstance(result, CallableData):
+            result = result()
+        elif isinstance(result, (list, tuple, dict, int, str, bytes, set)):
+            pass
+        elif not ignore_safe:
+            result = default
+        return result
+
+    def iter_data(self, safe=True):
+        if safe:
+            return iter([(k, self.get_data(k, ignore_safe=not safe)) for k, v in self.data.items()])
+        else:
+            return iter(self.data)
 
     def upload(self, **kwargs):
         """ 上传数据。
@@ -342,51 +327,23 @@ class RequestProgress:
         for k, v in kwargs.items():
             self.data[k] = v
 
-    def upload_default(self, key, default):
-        if key not in self.data:
-            self.data[key] = default
-
-    def enqueue(self, message=''):
+    def enqueue(self):
         self._status = REQ_QUEUING
         self.percent = 0
-        self.report('ENQUEUE:' + message)
 
-    def start(self, worker=None):
-        with self._lock:
-            self._started = True
-            self._status = REQ_RUNNING
-            self.percent = 0
-            self.timeleft = float('inf')
-            self.report('START:')
-            self.__worker__ = worker
+    def start(self):
+        self._status = REQ_RUNNING
+        self.percent = 0
+        self.timeleft = float('inf')
 
-    def stop(self):
-        self._status = REQ_STOPPED
-        with self._lock:
-            if self._started:
-                if self._closed:
-                    return False
-                while True:
-                    stopper = self._stoppers.get()
-                    if stopper is None:
-                        break
-                    try:
-                        stopper()
-                    except:
-                        pass
+    def close(self):
+        self.brake.destroy()
 
-    def close(self, *args, **kwargs):
-        self._stoppers.put(None)
-
-    def add_stopper(self, func):
-        self._stoppers.put(func)
-
-    def task_done(self, message=''):
+    def task_done(self):
         if self.status == REQ_RUNNING:
             self._status = REQ_DONE
             self.percent = 100
             self.timeleft = 0
-            self.report('TASK DONE:' + message)
 
     def error(self, message):
         self._status = REQ_ERROR
@@ -480,33 +437,17 @@ class Option:
         return self._content
 
 
-class Response:
-    def __init__(self, request, **desc):
-        self.__name = request.name
-        desc.update(request.progress.data)
-        self.__datadict = desc
-
-    def __getattr__(self, item):
-        return self.__datadict[item]
-
-    def __repr__(self):
-        return '<%s %s>' % (self.__name, str(self.__dict__))
-
-
-REQ_READY = 0
-REQ_QUEUING = 1
-REQ_RUNNING = 2
-REQ_STOPPED = 3
-REQ_WARNING = 4
-REQ_ERROR = -1
-REQ_DONE = 5
-
-
-RE_VALID_PATHNAME = re.compile(r'[\\/:*?"<>|\r\n]+')
+REQ_READY = 'ready'
+REQ_QUEUING = 'queuing'
+REQ_RUNNING = 'running'
+REQ_STOPPED = 'stopped'
+REQ_WARNING = 'warning'
+REQ_ERROR = 'error'
+REQ_DONE = 'done'
 
 
 class RootRequest(Request):
-    name = 'root'
+    NAME = 'root'
 
     discard_next = False
 
@@ -514,30 +455,47 @@ class RootRequest(Request):
         raise NotImplementedError
 
 
-def _all_status(iteration):
-    status = REQ_DONE
-    for i in iteration:
-        _b = i.status()
-        if _b == REQ_ERROR:
-            status = REQ_ERROR
-            break
-        elif _b == REQ_STOPPED:
-            status = REQ_STOPPED
-            break
-        elif _b == REQ_RUNNING:
-            status = REQ_RUNNING
-            break
-        elif _b != REQ_DONE:
-            status = REQ_QUEUING
-            break
-    return status
+def factor_request(request, rule):
+    """ 分解请求工作链。注意这可能存在无限迭代问题。
+    Args:
+        request: 被分解的请求
+        rule: 请求选择规则
+    """
+    def _select(o):
+        """ 处理选择请求的关系链。"""
+        if isinstance(o, Request):
+            return o
+        elif isinstance(o, Option):
+            return _select(o.content)
+        elif isinstance(o, Optional):
+            return _select(o.select(rule))
+
+        raise RuntimeError()
+
+    def _lookup(o):
+        """ 建立工作流串并行链。"""
+        o = _select(o)
+        if isinstance(o, RootRequest):
+            srp.append(o)
+            return None
+        s = []
+        for req in o.subrequest():
+            r = _lookup(req)
+            if r is None:
+                return None
+            s.extend(r)
+
+        if s:
+            return [s, o]
+        return [o]
+
+    srp = []
+    flow = _lookup(request)
+    return flow, srp
 
 
-def requester_info():
-    return_dict = {}
-    for v in Request.__subclasses__():
-        return_dict[v.name] = {
-            'weight': v.WEIGHT
-        }
-    return return_dict
+class CallableData(partial):
+    pass
 
+
+callable_data = CallableData

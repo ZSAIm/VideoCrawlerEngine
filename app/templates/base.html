@@ -30,7 +30,11 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#settings_content">设置
+                <a class="nav-link" data-toggle="tab" href="#settings-content">设置
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#worker-content">信息
                 </a>
             </li>
         </ul>
@@ -39,21 +43,23 @@
 
 {% endblock navbar %}
 
-
-
-
 {% block content %}
 <div class="container">
     <div class="tab-content">
-        <div id="task_content" class="container content tab-pane active">
-        {% block task_content %}
+        <div id="task-content" class="container content tab-pane active">
+            {% block task_content %}
 
-        {% endblock task_content %}
+            {% endblock task_content %}
         </div>
-        <div id="settings_content" class="container content tab-pane">
-        {% block settings_content %}
+        <div id="settings-content" class="container content tab-pane">
+            {% block settings_content %}
 
-        {% endblock settings_content %}
+            {% endblock settings_content %}
+        </div>
+        <div id="worker-content" class="container content tab-pane">
+            {% block worker_content %}
+
+            {% endblock worker_content %}
         </div>
     </div>
 </div>

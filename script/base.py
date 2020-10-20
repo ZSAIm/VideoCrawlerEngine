@@ -10,7 +10,7 @@ License:    Apache-2.0
 ==================================
 """
 
-from utils import extract_cookies_str_to_jar
+from uitls import extract_cookies_str_to_jar
 from script import ScriptBaseClass as BaseClass
 import requests
 
@@ -31,7 +31,7 @@ class ScriptBaseClass(BaseClass):
     license = 'Apache-2.0'
 
     quality_ranking = []
-    supported_domains = []
+    supported_domains = ['example.com']
 
     def __init__(self, config, url, quality, **options):
         """

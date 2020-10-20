@@ -1,6 +1,6 @@
 
-from . import ffmpeg as _ffmpeg
-from .request import (download, ffmpeg, script_request, next_script, Optional, Option)
-
+from requester.ffmpeg import ffmpeg as __ffmpeg
+from requester.request import (download, ffmpeg, script_request)
+from requester.base import Optional, Option
 
 

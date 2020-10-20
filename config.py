@@ -1,5 +1,8 @@
 import json
 import os
+from contexts import glb
+from tempfile import TemporaryDirectory
+
 
 SECTION_WORKER = 'worker'
 SECTION_BASIC = 'basic'
@@ -8,14 +11,15 @@ SECTION_SCRIPT = 'script'
 # 已注册的脚本
 REGISTERED_SCRIPT = {
     # 'base.py': '',
-    'bilibili.py': ''
+    'bilibili.py': '',
+    # 'fake.py': '',
 }
 
 # 用户配置
 BASIC_CONFIG = {
     'trust_unverified': False,
     'storage_dir': 'mp4',
-    'tempdir': 'temp',
+    'tempdir': '',
     'auto_select': True,
     'to_format': '.mp4',
     'registered': REGISTERED_SCRIPT,
@@ -29,74 +33,84 @@ SCRIPT_CONFIG = {
         'order': 100,
         'cookies': '',
         'proxies': None,
-        'active_version': None,
-        'selection_rule': 100,
+        'active': None,
+        'default_rule': 1,
         'to_format': ['.mp4'],
         'starter': ['start'],
         'append': ['convert', 'cleanup'],
-        'storage_dir': 'bilibili',
+        # 'savedir': 'bilibili',
         'remove_tempdir': True,
+    },
+    'fake': {
+        'order': 9999,
+        'cookies': '',
+        'proxies': None,
+        'active': None,
+        'default_rule': 1,
+        'target_format': ['.mp4'],
+        'append': ['convert', 'cleanup'],
+        'rm_tempdir': True,
+    },
+    # global 全局配置
+    None: {
+        'tempdir': '',
+        'to_format': '.mp4',
+        'savedir': '',
     }
 }
 
 
 WORKER_CONFIG = {
     'task': {
-        'engine': None,
         'max_concurrent': 3,
-        'timeout': None,
-        'async': True,
+        'tempdir': '',
+        'type': 'async',
     },
     'script': {
-        'engine': None,
         'max_concurrent': 3,
-        'timeout': None,
-        'tempdir': 'temp',
-
+        'type': 'thread',
     },
     'download': {
         'engine': 'Nbdler',
         'max_concurrent': 5,
         'max_speed': None,
         'timeout': None,
-        'async': True,
         'max_retries': 10,
+        'type': 'async',
     },
     'ffmpeg': {
         'engine': 'ffmpeg',
-        'max_concurrent': 2,
-        'timeout': None,
+        'max_concurrent': 5,
         'source': r'',
         'name': 'ffmpeg',
         'overwrite': True,
-        'async': True,
+        'type': 'async',
     },
     'convert': {
         'engine': 'ffmpeg',
         'max_concurrent': None,
-        'timeout': None,
-        'async': True,
+        'type': 'async',
     },
-
     'jsruntime': {
         'engine': 'NodeJS',
         'max_concurrent': 2,
-        'timeout': None,
         'name': 'node',
         'source': '',
         'version': None,
         'shell': False,
+        'type': 'thread',
     },
 
     'cleanup': {
         'engine': None,
         'max_concurrent': None,
+        'type': 'async',
     },
-    'error': {
-        'engine': None,
-        'max_concurrent': None,
-    }
-
+    'stop': {
+        'max_concurrent': 10,
+        'entrypoint': 'submit',
+        'type': 'thread',
+    },
 }
 
 CONFIG_JSON = {
@@ -121,8 +135,8 @@ def new_script_config():
         'order': 100,
         'cookies': '',
         'proxies': None,
-        'active_version': None,
-        'selection_rule': 100,
+        'active': None,
+        'default_rule': 1,
         'to_mimetype': ['.mp4'],
         'starter': ['start'],
         'append': ['convert', 'cleanup'],
@@ -137,22 +151,27 @@ def load_config():
     global CONFIG_JSON
     # 系统配置
     if not os.path.isfile('config.json'):
-        write_config()
+        writeback()
 
     with open('config.json', 'r', encoding='utf-8') as fp:
         CONFIG_JSON = json.load(fp)
 
+    config = dict(SCRIPT_CONFIG[None])
+    if not config['tempdir']:
+        config['tempdir'] = TemporaryDirectory().name
+    glb['config'].enter(config)
 
-def write_config():
+
+def writeback():
     """ 配置回写。"""
     global CONFIG_JSON
     with open('config.json', 'w', encoding='utf-8') as fp:
         json.dump(CONFIG_JSON, fp, indent=4, ensure_ascii=False)
 
 
-def get_script_config(script_name=None):
+def script_config(script_name=None):
     return get_config(SECTION_SCRIPT, script_name)
 
 
-def get_basic(key):
+def basic_config(key):
     return get_config(SECTION_BASIC, key)

@@ -8,16 +8,16 @@ Version:    0.1
 License:    Apache-2.0
 ==================================
 """
-from requester import next_script, download, Optional, Option, ffmpeg
+from requester import download, Optional, Option, ffmpeg
 from script import ScriptBaseClass, dbg
 import bs4
 import json
 import re
 
-re_playinfo = re.compile(
+reg_playinfo = re.compile(
     r'<script>.*?window\.__playinfo__\s*=(?:[(?:\s/\*).*?(?:\*/)\s])*(.*?)</script>')
 
-re_initial_state = re.compile(
+reg_initial_state = re.compile(
     r'<script>.*?window\.__INITIAL_STATE__\s*=(.*?);(\(function\s*\(\s*\)\s*\{.*?)?</script>')
 
 dash_params = {
@@ -207,7 +207,7 @@ class Bilibili(ScriptBaseClass):
     @staticmethod
     def parse_playinfo(html_res):
         # 解析 window.__playinfo__
-        res_playinfo = re_playinfo.search(html_res.text)
+        res_playinfo = reg_playinfo.search(html_res.text)
         if res_playinfo is None:
             raise ValueError(res_playinfo)
         playinfo = json.loads(res_playinfo.group(1))
@@ -216,11 +216,43 @@ class Bilibili(ScriptBaseClass):
     @staticmethod
     def parse_initial_state(html_res):
         # 解析 window.__INITIAL_STATE__
-        res_initial_state = re_initial_state.search(html_res.text)
-        if re_initial_state is None:
-            raise ValueError(re_initial_state)
+        res_initial_state = reg_initial_state.search(html_res.text)
+        if reg_initial_state is None:
+            raise ValueError(reg_initial_state)
         initial_state = json.loads(res_initial_state.group(1))
         return initial_state
+
+
+re_live_neptune_is_my_waifu = re.compile(r'<script>\s*window\.__NEPTUNE_IS_MY_WAIFU__\s*=\s*({.*?})\s*</script>')
+
+
+class BilibiliLive(ScriptBaseClass):
+    name = 'bilibili-live'
+    version = 0.1
+    author = 'ZSAIM'
+    created_date = '2020/06/19'
+
+    supported_domains = ['live.bilibili.com']
+    quality_ranking = [10000, 400, 250, 150, 100, 0]
+
+    def run(self):
+        html_res = self.request_get(self.url, headers=dict(headers))
+        # 汇报处理情况。
+        if html_res.status_code != 200:
+            dbg.error('%s %s: %s' % (html_res.status_code, html_res.reason, html_res.url))
+        else:
+            dbg.success('%s %s: %s' % (html_res.status_code, html_res.reason, html_res.url))
+
+        re_result = re_live_neptune_is_my_waifu.search(html_res.text)
+
+        neptune_is_my_waifu = json.loads(re_result.group(1))
+        base_info = neptune_is_my_waifu['baseInfoRes']
+        dbg.upload(
+            title=base_info['data']['title'],
+
+        )
+        dbg.upload(items=[])
+        print(neptune_is_my_waifu)
 
 
 if __name__ == '__main__':
@@ -232,3 +264,6 @@ if __name__ == '__main__':
     # bilibili = Bilibili.test('https://www.bilibili.com/video/BV1sK411p7vg', 100)
     bilibili = Bilibili.test('https://www.bilibili.com/video/BV14p4y1D7r7', 100)
     print(bilibili)
+
+    # live = BilibiliLive.test('https://live.bilibili.com/910819', 100)
+    # print(live)

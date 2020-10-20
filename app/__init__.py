@@ -1,5 +1,5 @@
 
-from flask import Flask
+from flask import Flask, g
 from flask_bootstrap import Bootstrap
 
 

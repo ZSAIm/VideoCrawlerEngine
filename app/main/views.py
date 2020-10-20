@@ -1,8 +1,7 @@
 
-from flask import render_template, request, abort, jsonify
-from _request import requester_info as get_requester_info
-from utils import json_stringify
-from task import new_task, get_task_list_info
+from flask import render_template, jsonify
+from uitls import json_stringify
+from flow import TaskStack
 from . import main
 from .forms import NewSubmitForm
 
@@ -16,32 +15,16 @@ def index():
 @main.route('/new', methods=['POST'])
 def submit_task():
     form = NewSubmitForm()
-    keys = []
+    task_resp = []
     if form.validate():
         urls = [url.strip() for url in form.urls.data.split('\n') if url.strip()]
-        keys = []
-        for url in urls:
-            keys.append(new_task(url))
-
-    return jsonify(keys)
+        task_resp = [TaskStack.new(url,) for url in urls]
+    return jsonify(task_resp)
 
 
-@main.route('/taskListInfo')
-def task_list_info():
-    return json_stringify(get_task_list_info())
-
-
-@main.route('/requesterInfo')
-def requester_info():
-    return json_stringify(get_requester_info())
-
-
-
-
-
-
-
-
+@main.route('/lstTasks')
+def lst_tasks():
+    return json_stringify(TaskStack.simple_all())
 
 
 
