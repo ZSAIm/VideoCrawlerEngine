@@ -115,12 +115,30 @@ def json_stringify(source,
                    indent=None):
     """ 处理非标准JSON的格式化问题。由于python内置的json会对nan, inf, -inf进行处理，这会造成非标准的JSON。"""
     def check_dict(o):
+        """
+        Check if o is a dict.
+
+        Args:
+            o: (dict): write your description
+        """
         return {go_check(k): go_check(v) for k, v in o.items()}
 
     def check_list_tuple_set(o):
+        """
+        Return a list of lists is a list.
+
+        Args:
+            o: (todo): write your description
+        """
         return [go_check(v) for v in o]
 
     def go_check(o):
+        """
+        Go through a dictionary or dicts.
+
+        Args:
+            o: (todo): write your description
+        """
         if isinstance(o, (list, tuple, set)):
             return check_list_tuple_set(o)
         elif isinstance(o, dict):
@@ -147,6 +165,14 @@ utility_package = {
 
 @contextmanager
 def js_session(source, timeout=None, engine=None):
+    """
+    R js javascript javascript.
+
+    Args:
+        source: (str): write your description
+        timeout: (float): write your description
+        engine: (todo): write your description
+    """
     from requester.request import jsruntime
 
     worker = get_config(SECTION_WORKER, 'jsruntime')

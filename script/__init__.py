@@ -70,35 +70,85 @@ class ScriptTask:
         self.config = config
 
     def __call__(self, url, quality=None, **kwargs):
+        """
+        Call a remote script.
+
+        Args:
+            self: (todo): write your description
+            url: (str): write your description
+            quality: (todo): write your description
+        """
         script_cls = self.script_cls
         config = self.config
         return script_cls(config, url, quality, **kwargs)
 
     @property
     def name(self):
+        """
+        Return the name of the script.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.script_cls.name
 
     @property
     def version(self):
+        """
+        Returns the version of the script.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.script_cls.version
 
     @property
     def supported_domains(self):
+        """
+        The domains supported by this node.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.script_cls.supported_domains
 
     @property
     def quality_ranking(self):
+        """
+        Returns the quality of this script.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.script_cls.quality_ranking
 
     @property
     def author(self):
+        """
+        Return the author of this author.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.script_cls.author
 
     @property
     def created_date(self):
+        """
+        Returns the date of the script.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.script_cls.created_date
 
     def __repr__(self):
+        """
+        Return a human - readable representation of this class.
+
+        Args:
+            self: (todo): write your description
+        """
         return '<ScriptTask %s==%s>' % (self.script_cls.name, self.script_cls.version)
 
 
@@ -154,6 +204,12 @@ class Scripts:
         return sorted(self.scripts.keys(), reverse=True)
 
     def __repr__(self):
+        """
+        Return a human - readable version.
+
+        Args:
+            self: (todo): write your description
+        """
         return '<Script %s==%s>' % (self.name, self.version)
 
 
@@ -215,6 +271,12 @@ def compile_script(script_name, verify=True):
 def select_script(scripts):
     """ 该方法会返回列表中优先级最高的脚本。"""
     def latest_version(name_version):
+        """
+        Return the version of the script.
+
+        Args:
+            name_version: (str): write your description
+        """
         return (script_config(split_name_version(name_version)[0]) or {'order': 0})['order']
     return max(scripts, key=latest_version)
 

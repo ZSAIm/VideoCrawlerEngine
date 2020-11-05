@@ -21,6 +21,12 @@ class FakeScript(ScriptBaseClass):
     quality_ranking = [0, 1, 2, 3, 4, 5]
 
     def run(self):
+        """
+        Runs the database.
+
+        Args:
+            self: (todo): write your description
+        """
         target = self.options.get('test_target')
         dbg.upload(items=target)
         return target

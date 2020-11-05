@@ -9,7 +9,19 @@ __ASYNC_ENTRYPOINT = {}
 
 
 def entrypoint(name):
+    """
+    A decorator that function decorator.
+
+    Args:
+        name: (str): write your description
+    """
     def wrapper(func):
+        """
+        Decorator for a function.
+
+        Args:
+            func: (callable): write your description
+        """
         if iscoroutinefunction(func):
             # @wraps(func)
             # async def wrapped(*args, **kwargs):
@@ -31,6 +43,12 @@ def entrypoint(name):
 
 @entrypoint('request')
 async def async_request_entrypoint(context):
+      """
+      Execute a request.
+
+      Args:
+          context: (todo): write your description
+      """
     with dbg.run(context) as debug:
         try:
             debug.start()

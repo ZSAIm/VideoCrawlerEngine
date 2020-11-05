@@ -8,12 +8,22 @@ from .forms import NewSubmitForm
 
 @main.route('/')
 def index():
+    """
+    Render a form.
+
+    Args:
+    """
     form = NewSubmitForm()
     return render_template('index.html', form=form)
 
 
 @main.route('/new', methods=['POST'])
 def submit_task():
+    """
+    Submit a new task.
+
+    Args:
+    """
     form = NewSubmitForm()
     task_resp = []
     if form.validate():
@@ -24,6 +34,11 @@ def submit_task():
 
 @main.route('/lstTasks')
 def lst_tasks():
+    """
+    Return all tasks in a task.
+
+    Args:
+    """
     return json_stringify(TaskStack.simple_all())
 
 

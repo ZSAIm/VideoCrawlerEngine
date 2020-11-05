@@ -68,12 +68,32 @@ class ScriptBaseClass(BaseClass):
         return self.session.request(method, url, **kwargs)
 
     def request_get(self, url, **kwargs):
+        """
+        Make a get request.
+
+        Args:
+            self: (todo): write your description
+            url: (str): write your description
+        """
         return self.request('GET', url, **kwargs)
 
     def request_post(self, url, **kwargs):
+        """
+        Make a post request.
+
+        Args:
+            self: (todo): write your description
+            url: (str): write your description
+        """
         return self.request('POST', url, **kwargs)
 
     def run(self):
+        """
+        Run the result of the specified arguments.
+
+        Args:
+            self: (todo): write your description
+        """
         raise NotImplementedError
 
     def quick_glance(self):
@@ -96,6 +116,12 @@ class ScriptBaseClass(BaseClass):
         return resp.text
 
     def __repr__(self):
+        """
+        Return a human - readable version.
+
+        Args:
+            self: (todo): write your description
+        """
         return '<CrawlerScript %s-%s>' % (self.name, self.version)
 
 
