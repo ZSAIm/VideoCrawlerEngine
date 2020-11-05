@@ -9,6 +9,13 @@ STREAM_ERROR = 2
 
 class PipeStreamHandler:
     def __init__(self, process):
+        """
+        Initialize the process.
+
+        Args:
+            self: (todo): write your description
+            process: (todo): write your description
+        """
         self.process = process
         # 默认使用ascii编码对bytes进行解码，这只是默认，
         # 如果默认的编码无法处理，会根据对应的chardet进行识别处理。
@@ -18,25 +25,74 @@ class PipeStreamHandler:
 
     @property
     def stdin(self):
+        """
+        Return the stdin stdin stdin stdin.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.process.stdin
 
     @property
     def stdout(self):
+        """
+        The stdout of the process.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.process.stdout
 
     @property
     def stderr(self):
+        """
+        Return the stderr of the process
+
+        Args:
+            self: (todo): write your description
+        """
         return self.process.stderr
 
     async def feed_data(self, data: Optional[bytes]):
+          """
+          Feed data to the socket.
+
+          Args:
+              self: (todo): write your description
+              data: (array): write your description
+          """
         self.stdin.write(data)
         await self.stdin.drain()
 
     async def _stream_handler(self, stream_id, line):
+          """
+          Handle a stream handler.
+
+          Args:
+              self: (todo): write your description
+              stream_id: (int): write your description
+              line: (str): write your description
+          """
         raise NotImplementedError
 
     async def run(self, input=None, close_after_feed=True, timeout=None):
+          """
+          Runs loop.
+
+          Args:
+              self: (todo): write your description
+              input: (str): write your description
+              close_after_feed: (bool): write your description
+              timeout: (float): write your description
+          """
         async def _stream_reader(fd, stream_id):
+              """
+              Reads lines from the stream.
+
+              Args:
+                  fd: (todo): write your description
+                  stream_id: (str): write your description
+              """
             nonlocal stream_getter
             try:
                 while True:
@@ -59,6 +115,11 @@ class PipeStreamHandler:
             await stream_getter.put(None)
 
         async def _stream_handler():
+              """
+              Get a stream handler.
+
+              Args:
+              """
             nonlocal stream_getter
 
             while True:
@@ -70,6 +131,11 @@ class PipeStreamHandler:
                     await self._stream_handler(*data)
 
         def _is_all_closed():
+            """
+            Return true if the connection is closed.
+
+            Args:
+            """
             return (self.stdout._transport.is_closing() and
                     self.stderr._transport.is_closing())
 

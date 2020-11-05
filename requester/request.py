@@ -13,11 +13,22 @@ import os
 
 @requester('jsruntime')
 def jsruntime(session, **kwargs):
+    """
+    Implements.
+
+    Args:
+        session: (todo): write your description
+    """
     session.leave()
 
 
 @requester('convert', weight=0.5)
 async def convert():
+      """
+      Convert all audio files in the db.
+
+      Args:
+      """
     from requester import ffmpeg
 
     merges = dbg.glb.task.find_by_name('ffmpeg')
@@ -59,12 +70,26 @@ class DownloadRequester(Request, URIs):
     NAME = 'download'
 
     def __init__(self, uri=None, headers=None, **kwargs):
+        """
+        Make a put request.
+
+        Args:
+            self: (todo): write your description
+            uri: (str): write your description
+            headers: (list): write your description
+        """
         Request.__init__(self)
         URIs.__init__(self)
         if uri:
             self.put(uri, headers, **kwargs)
 
     async def end_request(self):
+          """
+          Perform a request.
+
+          Args:
+              self: (todo): write your description
+          """
         temp = dbg.tempdir.mktemp()
         req = DlRequest(file_path=temp.filepath)
         for uri in self.dumps():
@@ -115,6 +140,12 @@ async def ffmpeg(inputs, callable_cmd, cal_len, **kwargs):
     from requester.ffmpeg import FFmpegStreamHandler, cal_total_length
 
     def input2pathname(input):
+        """
+        Convert input to a pathname.
+
+        Args:
+            input: (todo): write your description
+        """
         if isinstance(input, str):
             return input
         elif _is_related_types(input):
@@ -122,6 +153,11 @@ async def ffmpeg(inputs, callable_cmd, cal_len, **kwargs):
         assert input
 
     def percent():
+        """
+        Returns the percentage of the given length.
+
+        Args:
+        """
         nonlocal time_length, f
         return f.complete_length() * 100 / (time_length or float('inf'))
 
@@ -199,6 +235,15 @@ def fake_script(request_items, rule, **options):
 
 @requester('script', root=True)
 def script_request(url, rule=None, script=None, *, dismiss=False, **kwargs):
+    """
+    Create a script.
+
+    Args:
+        url: (str): write your description
+        rule: (todo): write your description
+        script: (str): write your description
+        dismiss: (todo): write your description
+    """
     if script is None:
         name = select_script(supported_script(url))
         script = get_script(name)

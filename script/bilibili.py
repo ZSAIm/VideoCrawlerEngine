@@ -61,10 +61,22 @@ class Bilibili(ScriptBaseClass):
     quality_ranking = [116, 80, 74, 64, 32, 16]
 
     def _init(self):
+        """
+        Initialize the html.
+
+        Args:
+            self: (todo): write your description
+        """
         self.html_res = None
         self.html_parse = None
 
     def run(self):
+        """
+        Main entry point.
+
+        Args:
+            self: (todo): write your description
+        """
         html_res = self.request_get(self.url, headers=dict(headers))
         # 汇报处理情况。
         if html_res.status_code != 200:
@@ -206,6 +218,12 @@ class Bilibili(ScriptBaseClass):
 
     @staticmethod
     def parse_playinfo(html_res):
+        """
+        Parse playinfo.
+
+        Args:
+            html_res: (todo): write your description
+        """
         # 解析 window.__playinfo__
         res_playinfo = reg_playinfo.search(html_res.text)
         if res_playinfo is None:
@@ -215,6 +233,12 @@ class Bilibili(ScriptBaseClass):
 
     @staticmethod
     def parse_initial_state(html_res):
+        """
+        Parse initial state.
+
+        Args:
+            html_res: (todo): write your description
+        """
         # 解析 window.__INITIAL_STATE__
         res_initial_state = reg_initial_state.search(html_res.text)
         if reg_initial_state is None:
@@ -236,6 +260,12 @@ class BilibiliLive(ScriptBaseClass):
     quality_ranking = [10000, 400, 250, 150, 100, 0]
 
     def run(self):
+        """
+        Main entry point.
+
+        Args:
+            self: (todo): write your description
+        """
         html_res = self.request_get(self.url, headers=dict(headers))
         # 汇报处理情况。
         if html_res.status_code != 200:

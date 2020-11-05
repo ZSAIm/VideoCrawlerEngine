@@ -7,63 +7,161 @@ __global_context__ = {}
 
 class GlobalContext:
     def __init__(self, name, namespace=''):
+        """
+        Initialize an attribute.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            namespace: (str): write your description
+        """
         self.value = None
         self.name = '.'.join(([namespace] if namespace else []) + [name])
         self.entered = False
 
     def enter(self, value):
+        """
+        Returns a global variable.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         self.entered = True
         self.value = value
         __global_context__[self.name] = self.value
         return self
 
     def leave(self):
+        """
+        Clears the context.
+
+        Args:
+            self: (todo): write your description
+        """
         del __global_context__[self.name]
         self.value = None
         self.entered = False
 
     def __enter__(self):
+        """
+        Decor function.
+
+        Args:
+            self: (todo): write your description
+        """
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Exit the given exception.
+
+        Args:
+            self: (todo): write your description
+            exc_type: (todo): write your description
+            exc_val: (todo): write your description
+            exc_tb: (todo): write your description
+        """
         self.leave()
 
     def get(self):
+        """
+        Returns the value of the current node.
+
+        Args:
+            self: (todo): write your description
+        """
         assert self.entered
         return self.value
 
 
 class ContextManager:
     def __init__(self, name, namespace='', default=None):
+        """
+        Initialize a new namespace.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            namespace: (str): write your description
+            default: (str): write your description
+        """
         self.context = ContextVar('.'.join(([namespace] if namespace else []) + [name]), default=[None, default])
         self.default = default
 
     @property
     def name(self):
+        """
+        Return the name of the context.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.context.name
 
     def enter(self, value):
+        """
+        Creates a new context.
+
+        Args:
+            self: (todo): write your description
+            value: (todo): write your description
+        """
         values = [None, value]
         token = self.context.set(values)
         values[0] = token
         return self
 
     def leave(self):
+        """
+        Reset the token.
+
+        Args:
+            self: (todo): write your description
+        """
         token, value = self.context.get()
         self.context.reset(token)
 
     def get(self):
+        """
+        Get the current result.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.context.get()[-1]
 
     __call__ = get
 
     def __enter__(self):
+        """
+        Decor function.
+
+        Args:
+            self: (todo): write your description
+        """
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Exit the given exception.
+
+        Args:
+            self: (todo): write your description
+            exc_type: (todo): write your description
+            exc_val: (todo): write your description
+            exc_tb: (todo): write your description
+        """
         self.leave()
 
     def __getitem__(self, item):
+        """
+        Return the value of a given item.
+
+        Args:
+            self: (todo): write your description
+            item: (str): write your description
+        """
         token, value = self.context.get()
         return value[item]
 
@@ -80,6 +178,15 @@ def lookup_chain_object(obj, chain_name):
 
 class AttributeContext:
     def __init__(self, name, namespace='', default=None):
+        """
+        Initialize a namespace.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            namespace: (str): write your description
+            default: (str): write your description
+        """
         *basename, objname = name.rsplit('.', 1)
         self.getter = ContextManager('.'.join(([namespace] if namespace else []) + basename + [f'get_{objname}']),
                                      default=[None, default])
@@ -88,10 +195,28 @@ class AttributeContext:
         self.name = name
 
     def enter(self, obj):
+        """
+        Enter an object.
+
+        Args:
+            self: (todo): write your description
+            obj: (todo): write your description
+        """
         def _getter():
+            """
+            Return the object from the given object.
+
+            Args:
+            """
             return lookup_chain_object(obj, self.name)
 
         def _setter(value):
+            """
+            Set the given value of an attribute.
+
+            Args:
+                value: (todo): write your description
+            """
             o = obj
             *basename, objname = self.name.split('.')
             for name in basename:
@@ -108,18 +233,49 @@ class AttributeContext:
         return self
 
     def leave(self):
+        """
+        Sets the inputed pipe.
+
+        Args:
+            self: (todo): write your description
+        """
         self.getter.leave()
         self.setter.leave()
 
     def __enter__(self):
+        """
+        Decor function.
+
+        Args:
+            self: (todo): write your description
+        """
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Exit the given exception.
+
+        Args:
+            self: (todo): write your description
+            exc_type: (todo): write your description
+            exc_val: (todo): write your description
+            exc_tb: (todo): write your description
+        """
         self.leave()
 
 
 class ObjectMappingContext:
     def __init__(self, attrs='', meths='', namespace='', default=None):
+        """
+        Initialize the attributes.
+
+        Args:
+            self: (todo): write your description
+            attrs: (str): write your description
+            meths: (str): write your description
+            namespace: (str): write your description
+            default: (str): write your description
+        """
         if isinstance(attrs, str):
             attrs = [name for name in attrs.split(' ') if name]
 
@@ -132,6 +288,13 @@ class ObjectMappingContext:
                                            if namespace else name, default=[None, default]) for name in meths}
 
     def enter(self, obj):
+        """
+        Enter an object on - link.
+
+        Args:
+            self: (todo): write your description
+            obj: (todo): write your description
+        """
         for k, v in self.attrs.items():
             v.enter(obj)
 
@@ -140,6 +303,12 @@ class ObjectMappingContext:
         return self
 
     def leave(self):
+        """
+        Leave all attributes from the context.
+
+        Args:
+            self: (todo): write your description
+        """
         for k, v in self.attrs.items():
             v.leave()
 
@@ -147,15 +316,37 @@ class ObjectMappingContext:
             v.leave()
 
     def __enter__(self):
+        """
+        Decor function.
+
+        Args:
+            self: (todo): write your description
+        """
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Exit the given exception.
+
+        Args:
+            self: (todo): write your description
+            exc_type: (todo): write your description
+            exc_val: (todo): write your description
+            exc_tb: (todo): write your description
+        """
         self.leave()
 
 
 class ContextNamespace:
     """ 上下文命名空间。 """
     def __init__(self, namespace):
+        """
+        Initialize a namespace.
+
+        Args:
+            self: (todo): write your description
+            namespace: (str): write your description
+        """
         self.namespace = namespace
         self.__context = {}
 
@@ -178,11 +369,25 @@ class ContextNamespace:
         return context
 
     def globalcontext(self, name):
+        """
+        Returns a global context. context.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+        """
         context = GlobalContext(name, self.namespace)
         self.__context[name] = context
         return context
 
     def __getitem__(self, item):
+        """
+        Return the item from the given item.
+
+        Args:
+            self: (todo): write your description
+            item: (str): write your description
+        """
         return self.__context[item]
 
     __getattr__ = __getitem__

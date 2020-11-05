@@ -122,6 +122,13 @@ CONFIG_JSON = {
 
 
 def get_config(section, field=None):
+    """
+    Get the configuration value of the given section.
+
+    Args:
+        section: (dict): write your description
+        field: (str): write your description
+    """
     global CONFIG_JSON
     section = CONFIG_JSON.get(section)
     if field:
@@ -170,8 +177,20 @@ def writeback():
 
 
 def script_config(script_name=None):
+    """
+    Get a script configuration.
+
+    Args:
+        script_name: (str): write your description
+    """
     return get_config(SECTION_SCRIPT, script_name)
 
 
 def basic_config(key):
+    """
+    Get a config key.
+
+    Args:
+        key: (str): write your description
+    """
     return get_config(SECTION_BASIC, key)

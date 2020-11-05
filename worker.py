@@ -17,17 +17,45 @@ class Workers:
     __type__ = None
 
     def __init__(self, name, max_workers, entrypoint=None, *args, **kwargs):
+        """
+        Initialize workers.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            max_workers: (int): write your description
+            entrypoint: (str): write your description
+        """
         self.name = name
         self.max_workers = max_workers
         self.entrypoint = entrypoint
 
     def submit(self):
+        """
+        Submit a request.
+
+        Args:
+            self: (todo): write your description
+        """
         raise NotImplementedError
 
     def run(self):
+        """
+        Run the result of the specified arguments.
+
+        Args:
+            self: (todo): write your description
+        """
         raise NotImplementedError
 
     def shutdown(self, wait=True):
+        """
+        Shutdown the connection. shutdown.
+
+        Args:
+            self: (todo): write your description
+            wait: (bool): write your description
+        """
         pass
 
 
@@ -35,13 +63,32 @@ class NullWorkers(Workers):
     __type__ = 'null'
 
     def submit(self, *args, **kwargs):
+        """
+        Submit a job.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.run(*args, **kwargs)
 
     def run(self, *args, **kwargs):
+        """
+        Run the entry point.
+
+        Args:
+            self: (todo): write your description
+        """
         with glb['worker'].enter(self):
             return get_entrypoint(self.entrypoint, False)(*args, **kwargs)
 
     def shutdown(self, wait=True):
+        """
+        Shutdown the connection. shutdown.
+
+        Args:
+            self: (todo): write your description
+            wait: (bool): write your description
+        """
         pass
 
 
@@ -50,16 +97,41 @@ class AsyncNullWorkers(Workers):
 
     @property
     def loop(self):
+        """
+        The async loop.
+
+        Args:
+            self: (todo): write your description
+        """
         return asyncio.get_running_loop()
 
     def submit(self, *args, **kwargs):
+        """
+        Submit a job.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.run(*args, **kwargs)
 
     def run(self, *args, **kwargs):
+        """
+        Run entry point.
+
+        Args:
+            self: (todo): write your description
+        """
         with glb['worker'].enter(self):
             return get_entrypoint(self.entrypoint, True)(*args, **kwargs)
 
     def shutdown(self, wait=True):
+        """
+        Shutdown the connection. shutdown.
+
+        Args:
+            self: (todo): write your description
+            wait: (bool): write your description
+        """
         pass
 
 
@@ -95,6 +167,17 @@ class ThreadWorkers(Workers):
     __type__ = 'thread'
 
     def __init__(self, name, max_workers, entrypoint=None, *, initializer=None, initargs=()):
+        """
+        Initialize workers.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            max_workers: (int): write your description
+            entrypoint: (str): write your description
+            initializer: (todo): write your description
+            initargs: (todo): write your description
+        """
         Workers.__init__(self, name, max_workers, entrypoint)
         self.workers = ThreadPoolExecutor(
             max_workers, thread_name_prefix=name,
@@ -114,11 +197,24 @@ class ThreadWorkers(Workers):
         )
 
     def run(self, *args, **kwargs):
+        """
+        Run the entry point.
+
+        Args:
+            self: (todo): write your description
+        """
         with glb['worker'].enter(self):
             return get_entrypoint(self.entrypoint, False)(*args, **kwargs)
         # return request_entrypoint(*args, **kwargs)
 
     def shutdown(self, wait=True):
+        """
+        Shutdown all workers.
+
+        Args:
+            self: (todo): write your description
+            wait: (bool): write your description
+        """
         return self.workers.shutdown(wait)
 
 
@@ -126,7 +222,21 @@ class AsyncWorkers(Workers):
     __type__ = 'async'
 
     def __init__(self, name, max_workers, entrypoint=None, *args, **kwargs):
+        """
+        Create a new : class.
+
+        Args:
+            self: (todo): write your description
+            name: (str): write your description
+            max_workers: (int): write your description
+            entrypoint: (str): write your description
+        """
         def setup_async_thread():
+            """
+            Setup the asyncio event loop.
+
+            Args:
+            """
             nonlocal ready_evt
             if sys.platform == 'win32':
                 loop = asyncio.ProactorEventLoop()
@@ -164,6 +274,12 @@ class AsyncWorkers(Workers):
         ready_evt.wait()
 
     def submit(self, *args, **kwargs):
+        """
+        Submit a coroutine.
+
+        Args:
+            self: (todo): write your description
+        """
         # fut = asyncio.run_coroutine_threadsafe(self.run(*args, **kwargs), self.loop)
         # try:
         #     # 如果当前存在协程循环，则返回协程future，否则返回线程future。
@@ -177,18 +293,44 @@ class AsyncWorkers(Workers):
         )
 
     async def run(self, *args, **kwargs):
+          """
+          Run the entry point.
+
+          Args:
+              self: (todo): write your description
+          """
         with glb['worker'].enter(self):
             async with self._sema:
                 return await get_entrypoint(self.entrypoint, True)(*args, **kwargs)
             # return await async_request_entrypoint(*args, **kwargs)
 
     def shutdown(self, wait=True):
+        """
+        Shutdown the event loop.
+
+        Args:
+            self: (todo): write your description
+            wait: (bool): write your description
+        """
         self.loop.call_soon_threadsafe(self.loop.stop)
         super().shutdown(wait)
 
 
 def setup_worker(name, config):
+    """
+    Setup the worker.
+
+    Args:
+        name: (str): write your description
+        config: (todo): write your description
+    """
     def get_workers_cls(type_name):
+        """
+        Returns a dictionary of workers.
+
+        Args:
+            type_name: (str): write your description
+        """
         for subcls in Workers.__subclasses__():
             if subcls.__type__ == type_name:
                 return subcls
@@ -231,15 +373,33 @@ def get_worker(name):
 
 
 def shutdown_all():
+    """
+    Shutdown all open connections to all instances.
+
+    Args:
+    """
     global REGISTERED_WORKER
     for k, v in REGISTERED_WORKER.items():
         v.shutdown(False)
 
 
 def shutdown(name, wait=True):
+    """
+    Shutdown a named listener.
+
+    Args:
+        name: (str): write your description
+        wait: (bool): write your description
+    """
     get_worker(name).shutdown(wait)
 
 
 def restart(name):
+    """
+    Restart the worker.
+
+    Args:
+        name: (str): write your description
+    """
     get_worker(name).shutdown(True)
     setup_worker(name, get_config(SECTION_WORKER))

@@ -25,6 +25,13 @@ __task_stacks__ = {}
 
 class ScriptLayer(Layer):
     def __init__(self, script):
+        """
+        Initialize the script.
+
+        Args:
+            self: (todo): write your description
+            script: (str): write your description
+        """
         self.depth = 0
 
         self.script = script
@@ -33,12 +40,30 @@ class ScriptLayer(Layer):
         self.flows = None
 
     def __len__(self):
+        """
+        Returns the number of bytes.
+
+        Args:
+            self: (todo): write your description
+        """
         return len(self.flows)
 
     def __iter__(self):
+        """
+        Return an iterator over all iterable objects.
+
+        Args:
+            self: (todo): write your description
+        """
         return iter(self.flows or [])
 
     async def execute_script(self):
+          """
+          Execute a script.
+
+          Args:
+              self: (todo): write your description
+          """
         try:
             result = await self.script.start_request()
         except Exception as e:
@@ -69,6 +94,12 @@ class ScriptLayer(Layer):
         await self.flows.locale(mark_branch_index=True)
 
     async def run(self):
+          """
+          Run the script
+
+          Args:
+              self: (todo): write your description
+          """
         if not self.flows and not self.subscripts:
             await self.execute_script()
 
@@ -78,6 +109,12 @@ class ScriptLayer(Layer):
             return await self.flows.run()
 
     def stop(self):
+        """
+        Stops the daemon.
+
+        Args:
+            self: (todo): write your description
+        """
         asyncio.run(asyncio.wait([f.stop() for f in self.flows]))
         # 重启stop worker线程，避免过多的线程滞留
         worker.restart('stop')
@@ -85,7 +122,22 @@ class ScriptLayer(Layer):
 
 @requester('task')
 async def start_task(url, rule=None, **options):
+      """
+      Start a new task.
+
+      Args:
+          url: (str): write your description
+          rule: (str): write your description
+          options: (dict): write your description
+      """
     async def _worker(index, layer):
+          """
+          Evaluate the worker.
+
+          Args:
+              index: (int): write your description
+              layer: (todo): write your description
+          """
         # 定位工作层节点并编号
         # with b.enter(index):
         with a.enter(index):
@@ -124,13 +176,33 @@ class FakeTask(Request):
     NAME = 'task'
 
     def __init__(self, **fake_script_options):
+        """
+        Initialize the event loop.
+
+        Args:
+            self: (todo): write your description
+            fake_script_options: (todo): write your description
+        """
         self._queue = None
         self._ready = threading.Event()
         self.fake_script_options = fake_script_options
         self.loop = None
 
     async def end_request(self):
+          """
+          This is a worker.
+
+          Args:
+              self: (todo): write your description
+          """
         async def _worker(layer, index):
+              """
+              Evaluate the given layer.
+
+              Args:
+                  layer: (todo): write your description
+                  index: (int): write your description
+              """
             with b.enter(index):
                 await layer.locale()
 
@@ -165,17 +237,40 @@ class FakeTask(Request):
             acnt += 1
 
     def run(self, o, **options):
+        """
+        Starts an async async loop.
+
+        Args:
+            self: (todo): write your description
+            o: (int): write your description
+            options: (dict): write your description
+        """
         self._ready.wait(timeout=10)
         asyncio.run_coroutine_threadsafe(self._queue.put((o, options)),
                                          loop=self.loop)
 
 
 def cat_abcde(abcde_lst, cat_str='-'):
+    """
+    Return a string representation of cat cat cat.
+
+    Args:
+        abcde_lst: (todo): write your description
+        cat_str: (str): write your description
+    """
     return cat_str.join([str(i) for i in abcde_lst])
 
 
 class TaskStack:
     def __init__(self, url, **options):
+        """
+        Initialize the task.
+
+        Args:
+            self: (todo): write your description
+            url: (str): write your description
+            options: (dict): write your description
+        """
         self.url = url
         self.options = options
         if dbg.__debug_mode__:
@@ -188,43 +283,109 @@ class TaskStack:
 
     @property
     def key(self):
+        """
+        Returns the key for this key.
+
+        Args:
+            self: (todo): write your description
+        """
         return hashlib.md5(
             hex(make_key((self.url,), self.options, True).hashvalue).encode('utf-8')
         ).hexdigest()
 
     @property
     def blen(self):
+        """
+        Returns the number of all branches.
+
+        Args:
+            self: (todo): write your description
+        """
         return len(self.all_branches_works)
 
     @property
     def current_branch(self):
+        """
+        Return the current branches.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.all_branches_works[f'{a()}-{b()}']
 
     def all_works(self):
+        """
+        Iterate over all branches.
+
+        Args:
+            self: (todo): write your description
+        """
         for k, v in self.all_branches_works.items():
             yield from v.items()
 
     def run_background(self):
+        """
+        Run the task.
+
+        Args:
+            self: (todo): write your description
+        """
         with a.enter(0), glb['task'].enter(self):
             return self.taskreq.start_request()
 
     def debug(self, o, **options):
+        """
+        Run a debug command.
+
+        Args:
+            self: (todo): write your description
+            o: (todo): write your description
+            options: (dict): write your description
+        """
         assert dbg.__debug_mode__
         with glb['task'].enter(self):
             self.taskreq.start_request()
             self.taskreq.run(o, **options)
 
     def stop(self):
+        """
+        Stop the task.
+
+        Args:
+            self: (todo): write your description
+        """
         self.taskreq.stop()
 
     def __enter__(self):
+        """
+        Enter the running daemon.
+
+        Args:
+            self: (todo): write your description
+        """
         print(abcde.get())
         self.running.add(abcde.get())
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Exit the given exception.
+
+        Args:
+            self: (todo): write your description
+            exc_type: (todo): write your description
+            exc_val: (todo): write your description
+            exc_tb: (todo): write your description
+        """
         self.running.remove(abcde.get())
 
     def add_work(self, work):
+        """
+        Add a new work.
+
+        Args:
+            self: (todo): write your description
+            work: (int): write your description
+        """
         self.current_branch[work.__locale__] = work
 
     def find_by_name(self, name):
@@ -232,6 +393,12 @@ class TaskStack:
         return [v for k, v in self.current_branch.items() if v.NAME == name]
 
     def simple(self):
+        """
+        Perform simple simple simple simple simple simple simple simple simple simple simple simple simple simple simple simple algorithm.
+
+        Args:
+            self: (todo): write your description
+        """
         all_nodes = {}
         requesters = defaultdict(list)
         sum_weight = 0
@@ -312,6 +479,13 @@ class TaskStack:
         }
 
     def detail(self, abcde_str):
+        """
+        Returns a progress bar.
+
+        Args:
+            self: (todo): write your description
+            abcde_str: (str): write your description
+        """
         a, b, c, d, e = abcde_str.split('-')
         abcde_tuple = (int(a), int(b), int(c), int(d), int(e))
         request = self.all_branches_works[f'{a}-{b}'][abcde_tuple]
@@ -320,6 +494,14 @@ class TaskStack:
 
     @classmethod
     def new(cls, url, **options):
+        """
+        Create a new task.
+
+        Args:
+            cls: (todo): write your description
+            url: (str): write your description
+            options: (dict): write your description
+        """
         global __task_stacks__
         key = hashlib.md5(
             hex(make_key((url,), options, True).hashvalue).encode('utf-8')
@@ -339,10 +521,23 @@ class TaskStack:
 
     @classmethod
     def get_supported(cls, url):
+        """
+        Returns the supported supported checks.
+
+        Args:
+            cls: (callable): write your description
+            url: (str): write your description
+        """
         return supported_script(url)
 
     @classmethod
     def simple_all(cls):
+        """
+        A simple simple simple simple simple simple simple classes.
+
+        Args:
+            cls: (callable): write your description
+        """
         global __task_stacks__
         return {
             k: v.simple() for k, v in __task_stacks__.items()
@@ -350,16 +545,35 @@ class TaskStack:
 
     @staticmethod
     def get_task(key):
+        """
+        Return a task from the given key.
+
+        Args:
+            key: (str): write your description
+        """
         global __task_stacks__
         return __task_stacks__[key]
 
 
 
 def get_task(key):
+    """
+    Return the task for the given.
+
+    Args:
+        key: (str): write your description
+    """
     return __task_stacks__[key]
 
 
 if __name__ == '__main__':
     class TestNode:
         def __init__(self, name):
+            """
+            Init a new instance
+
+            Args:
+                self: (todo): write your description
+                name: (str): write your description
+            """
             print(name)

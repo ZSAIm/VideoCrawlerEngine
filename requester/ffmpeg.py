@@ -72,6 +72,12 @@ CHECKPOINT_RESULT = 4
 
 
 def split_colon_keyword_dict(s):
+    """
+    Split a string into a dictionary of key / value pairs.
+
+    Args:
+        s: (str): write your description
+    """
     retdict = {}
     for line in [i.strip() for i in s.split('\n') if i]:
         k, v = line.split(':', 1)
@@ -83,6 +89,13 @@ def split_colon_keyword_dict(s):
 class FFmpegStreamHandler(PipeStreamHandler):
 
     def __init__(self, process):
+        """
+        Initialize simulation.
+
+        Args:
+            self: (todo): write your description
+            process: (todo): write your description
+        """
         super().__init__(process)
         self.output_sequences = []
         self.cp_iter = iter(CHECKPOINT_SEQUENCES)
@@ -90,6 +103,12 @@ class FFmpegStreamHandler(PipeStreamHandler):
         self.checkpoint = next(self.cp_iter)
 
     def _get_frame(self):
+        """
+        Return a dictionary of frames
+
+        Args:
+            self: (todo): write your description
+        """
         try:
             frame = self.output_sequences[CHECKPOINT_FRAME][-1]
         except IndexError:
@@ -107,6 +126,12 @@ class FFmpegStreamHandler(PipeStreamHandler):
 
     @staticmethod
     def _file_metadata(metadata_str):
+        """
+        Parse metadata file.
+
+        Args:
+            metadata_str: (str): write your description
+        """
         metadata = REG_METADATA.search(metadata_str)
         metadata_dict = {}
         if metadata:
@@ -115,6 +140,12 @@ class FFmpegStreamHandler(PipeStreamHandler):
         return metadata_dict
 
     def get_inputs(self):
+        """
+        Returns a list of input_inputs
+
+        Args:
+            self: (todo): write your description
+        """
         try:
             input_str = ''.join(self.output_sequences[CHECKPOINT_INPUT])
         except IndexError:
@@ -165,6 +196,12 @@ class FFmpegStreamHandler(PipeStreamHandler):
             return input_lst
 
     def get_outputs(self):
+        """
+        Returns a dictionary of outputs for each dict
+
+        Args:
+            self: (todo): write your description
+        """
         try:
             output_str = ''.join(self.output_sequences[CHECKPOINT_OUTPUT])
         except IndexError:
@@ -203,35 +240,85 @@ class FFmpegStreamHandler(PipeStreamHandler):
             return output_lst
 
     def speed(self):
+        """
+        Returns the speed.
+
+        Args:
+            self: (todo): write your description
+        """
         frame_dict = self._get_frame()
         return frame_dict.get('speed', 'unknown')
 
     def size(self):
+        """
+        : return : class : frame size.
+
+        Args:
+            self: (todo): write your description
+        """
         frame_dict = self._get_frame()
         return frame_dict.get('size', frame_dict.get('Lsize', 'unknown'))
 
     def complete_length(self):
+        """
+        Calculate the length of the task.
+
+        Args:
+            self: (todo): write your description
+        """
         frame_dict = self._get_frame()
         tm = datetime.strptime(frame_dict.get('time', '00:00:00.00'), '%H:%M:%S.%f')
         time_length = tm.hour * 3600 + tm.minute * 60 + tm.second + tm.microsecond / 1e6
         return time_length
 
     def total_length(self):
+        """
+        Returns the total length of the queue.
+
+        Args:
+            self: (todo): write your description
+        """
         self.get_inputs()
         return 0
 
     def complete_percent(self):
+        """
+        Returns the total percentage.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.complete_length() / self.total_length()
 
     def bitrate(self):
+        """
+        Returns the bitrate frame.
+
+        Args:
+            self: (todo): write your description
+        """
         frame_dict = self._get_frame()
         return frame_dict.get('bitrate', 'unknown')
 
     def fps(self):
+        """
+        Return a dictionary of the frame.
+
+        Args:
+            self: (todo): write your description
+        """
         frame_dict = self._get_frame()
         return frame_dict.get('fps', 'unknown')
 
     async def _stream_handler(self, stream_id, line):
+          """
+          Handler for streams
+
+          Args:
+              self: (todo): write your description
+              stream_id: (int): write your description
+              line: (str): write your description
+          """
         if self.checkpoint(stream_id, line):
             self.output_sequences.append([])
             try:
@@ -244,12 +331,31 @@ class FFmpegStreamHandler(PipeStreamHandler):
 
 
 def ffmpeg_operator(func=None, *, cal_len=True):
+    """
+    Decorator to call a function on a fixed - length operator.
+
+    Args:
+        func: (callable): write your description
+        cal_len: (int): write your description
+    """
     if func is None:
         def wrapper(func):
+            """
+            Decor function that returns a function to the result.
+
+            Args:
+                func: (callable): write your description
+            """
             return ffmpeg_operator(func, cal_len=cal_len)
     else:
         @wraps(func)
         def wrapper(inputs, **kwargs):
+            """
+            Calculate fft.
+
+            Args:
+                inputs: (array): write your description
+            """
             return ffmpeg(inputs, callable_cmd=func, cal_len=cal_len, **kwargs)
 
         # FFmpeg操作方法添加到ffmpeg请求器
@@ -259,6 +365,15 @@ def ffmpeg_operator(func=None, *, cal_len=True):
 
 @ffmpeg_operator
 async def cmdline(inputs, output, cmd, input_getter=None):
+      """
+      Format command output.
+
+      Args:
+          inputs: (array): write your description
+          output: (todo): write your description
+          cmd: (str): write your description
+          input_getter: (todo): write your description
+      """
     if input_getter is None:
         return cmd.format(*inputs, output=output)
     else:
@@ -267,6 +382,13 @@ async def cmdline(inputs, output, cmd, input_getter=None):
 
 @ffmpeg_operator
 async def concat_av(inputs, output):
+      """
+      Concatenate a video.
+
+      Args:
+          inputs: (todo): write your description
+          output: (str): write your description
+      """
     video, audio = inputs
     cmd = ['-i', f'{video}',
            '-i', f'{audio}',
@@ -277,6 +399,13 @@ async def concat_av(inputs, output):
 
 @ffmpeg_operator
 async def concat_demuxer(inputs, output):
+      """
+      Concatenate input fasta to hdf5.
+
+      Args:
+          inputs: (todo): write your description
+          output: (todo): write your description
+      """
     tempfile = dbg.tempdir.mktemp('.txt')
     concat_input = '\n'.join([f'file \'{input}\'' for input in inputs])
 
@@ -290,6 +419,13 @@ async def concat_demuxer(inputs, output):
 
 @ffmpeg_operator
 async def concat_protocol(inputs, output):
+      """
+      Concatenate protobjs.
+
+      Args:
+          inputs: (todo): write your description
+          output: (str): write your description
+      """
     concat_input = '|'.join(inputs)
     cmd = ['-i', f'concat:\'{concat_input}\'', '-c', 'copy', f'{output}']
     return cmd
@@ -297,6 +433,14 @@ async def concat_protocol(inputs, output):
 
 @ffmpeg_operator
 async def convert(inputs, output, h265=False):
+      """
+      Convert inputs and output.
+
+      Args:
+          inputs: (todo): write your description
+          output: (todo): write your description
+          h265: (todo): write your description
+      """
     input, *_ = inputs
     cmd = ['-i', input, '-y', '-qscale', '0', '-vcodec', 'libx264', output]
     return cmd
@@ -304,6 +448,13 @@ async def convert(inputs, output, h265=False):
 
 @ffmpeg_operator(cal_len=False)
 async def information(inputs, **options):
+      """
+      Return a list of options.
+
+      Args:
+          inputs: (array): write your description
+          options: (dict): write your description
+      """
     cmd = []
     for input in inputs:
         cmd.extend(['-i', input])
@@ -312,6 +463,13 @@ async def information(inputs, **options):
 
 
 async def cal_total_length(inputs, **options):
+      """
+      Calculate total total length of a video.
+
+      Args:
+          inputs: (array): write your description
+          options: (dict): write your description
+      """
     info = information(inputs)
     await info.start_request()
     all_inputs = info.get_data('input', {})
