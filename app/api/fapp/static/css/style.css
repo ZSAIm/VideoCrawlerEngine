@@ -1,0 +1,130 @@
+body, html {
+    height: 100%;
+}
+.profile-thumbnail {
+    position: absolute;
+}
+.profile-header {
+    min-height: 260px;
+    margin-left: 280px;
+}
+ul.tasks {
+    list-style-type: none;
+    padding: 0px;
+    margin: 16px 0px 0px 0px;
+    border-top: 1px solid #e0e0e0;
+    overflow-y: scroll;
+    height: 100%;
+}
+ul.tasks li.task {
+    padding: 8px;
+    border-bottom: 1px solid #e0e0e0;
+    height: 82px;
+}
+ul.tasks li.task:hover {
+    background-color: #f0f0f0;
+}
+
+div.task-body {
+    font-size: 12px;
+    color: #6c757d;
+}
+div.task-title {
+    font-weight: bold;
+}
+div.task-tip {
+    float: right;
+}
+div.task-percent {
+    float: right;
+    font-size: 12px;
+}
+div.task-thumbnail {
+    position: absolute;
+}
+div.task-status {
+    width: 8px;
+    float: left;
+    height: 100%;
+    background-color: black;
+}
+div.task-footer {
+    display: flex;
+    height: 25px;
+}
+
+div.task-footer div.task-progress {
+    border-radius: 1px;
+    flex: 1;
+    margin-top: auto;
+    margin-bottom: auto;
+    height: 15px;
+}
+
+
+div.task-content {
+    margin-left: 20px;
+    min-height: 48px;
+}
+
+
+.container {
+    width: auto;
+    max-width: none;
+    padding-right: 0px;
+    padding-left: 0px;
+    margin-right: 0px;
+    margin-left: 10px;
+    padding-top: 44px;
+    margin-top: -15px;
+    height: 100%;
+
+}
+.container .tab-content {
+    height: 100%;
+    width: 100%;
+}
+
+#task-content {
+    padding-top: 30px;
+    margin-left: 0px;
+}
+
+div.settings, div.worker {
+    height: 100%;
+}
+
+.settings-pane, .worker-pane{
+    overflow-y: scroll;
+    height: 100%
+}
+.settings-pane h1 , .worker-pane h1{
+    padding-top: 20px;
+    padding-bottom: 13px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+.settings-pane .form-inline label {
+    padding-left: 5px;
+    display: unset;
+}
+
+.settings-nav, .worker-nav{
+    float: left;
+    height: 100%;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.settings-nav nav, .worker-nav nav{
+    padding-left: 0px;
+    padding-right: 0px;
+    width: 100%;
+}
+.settings-nav nav ul, .worker-nav nav ul{
+    margin-right: 12px;
+    width: 100%;
+}
+.settings-nav ul li a.active, .worker-nav ul li a.active{
+    background-color: #dedede;
+
+}
