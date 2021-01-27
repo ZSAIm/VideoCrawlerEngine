@@ -12,7 +12,7 @@ from .flow import (
     FlowPayload,
     findall_subpayload,
 )
-from .serialize import (
+from .resolve import (
     parse_payload,
     unparse_payload,
     undictify_payload,

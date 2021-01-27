@@ -2,14 +2,15 @@ import asyncio
 
 from helper import worker
 from traceback import print_exc
-from helper.ctxtools import ctx as dbg
-from helper.ctxtools.vars.flow import glb, b, tempdir
+from helper.ctxtools import ctx
+from helper.ctxtools.vars.flow import glb, a, b, tempdir, flow_mgr
 from helper.ctxtools.vars.script import script
 from .flow import ParallelLayer
 from .base import BaseLayer
 from helper.payload import get_payload_by_name, get_payload_by_sign, gen_linear_flow
 from request.helper.tempfile import TemporaryDir
 from contextlib import ExitStack
+from typing import Tuple, Optional
 
 
 class ScriptLayer(BaseLayer):
@@ -20,6 +21,8 @@ class ScriptLayer(BaseLayer):
 
         self.subscripts = None
         self.layers = None
+        self.point = ()
+        self.raw_flows = []
 
     def __len__(self):
         return len(self.layers)
@@ -36,7 +39,7 @@ class ScriptLayer(BaseLayer):
                 print_exc()
                 raise
         subscripts = []
-        subnodes = []
+        raw_flows = []
 
         ctxmgr_value = {
             glb['script']: self.script,
@@ -45,10 +48,9 @@ class ScriptLayer(BaseLayer):
         }
 
         with ExitStack() as stack:
-            contexts = [
+            for ctxmgr, value in ctxmgr_value.items():
                 stack.enter_context(ctxmgr.apply(value))
-                for ctxmgr, value in ctxmgr_value.items()
-            ]
+
             for index, item in enumerate(all_items):
                 with b.apply(index):
                     f, s = gen_linear_flow(item, self.script['rule'])
@@ -58,10 +60,11 @@ class ScriptLayer(BaseLayer):
                         for name in self.script.getdata('config', {}).get('append', [])
                     ]
                     f.extend(extra_flows)
-                    subnodes.append(f)
+                    raw_flows.append(f)
                     subscripts.extend(ScriptLayer(s))
 
-            self.layers = ParallelLayer(1, subnodes, is_scriptlayer=True)
+            self.raw_flows = raw_flows
+            self.layers = ParallelLayer(1, raw_flows, is_scriptlayer=True)
             self.subscripts = subscripts
 
         return subscripts
@@ -72,6 +75,7 @@ class ScriptLayer(BaseLayer):
 
     def setpoint(self):
         """"""
+        self.script.__point__ = self.point = (a.get(), )
         self.layers.setpoint()
 
     async def run(self, reload=False):
@@ -79,7 +83,8 @@ class ScriptLayer(BaseLayer):
             await self.execute_script()
 
         with glb['script'].apply(self.script), \
-             tempdir.apply(TemporaryDir(self.script.getdata('tempdir'))):
+             tempdir.apply(TemporaryDir(self.script.getdata('tempdir'))), \
+             ctx.flow.enter_root(self.point):
 
             return await self.layers.run()
 

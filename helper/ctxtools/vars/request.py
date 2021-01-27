@@ -15,4 +15,4 @@ request_mapping_context = ObjectMappingContext(
     meths='end_request error_handler ',
 )
 self_request = ContextManager('__request__')
-config_context = ContextManager('config', {})
+config_context = ContextManager('config', default={})

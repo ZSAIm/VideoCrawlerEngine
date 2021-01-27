@@ -9,7 +9,7 @@ from exception import (
     APIBaseError,
 )
 from helper.codetable import VALIDATE_ERROR
-from traceback import format_exc
+from traceback import format_exc, print_exc
 
 
 async def api_exception_handler(
@@ -44,6 +44,7 @@ async def validation_exception_handler(
     request: Request,
     exc: RequestValidationError
 ):
+    print_exc()
     return JSONResponse(
         status_code=418,
         content=dict(

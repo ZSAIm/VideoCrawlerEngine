@@ -1,4 +1,4 @@
-from .base import ConfMeta, List
+from .base import ConfMeta, List, FileSize
 
 
 class ScriptConf(
@@ -14,8 +14,9 @@ class ScriptConf(
     to_format: List(sep='|')
     append: List(sep=',')
 
-    strict: bool
-    convert: List(sep=' ')
+    convert_strict: bool
+
+    maxsize: FileSize()
 
     @staticmethod
     def default():

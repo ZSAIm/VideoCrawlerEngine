@@ -54,7 +54,7 @@ def simple_script(
     rule: Optional[Union[str, int]],
     script_task: ScriptTask,
     *,
-    allow_child_script: bool = False,
+    prevent: bool = False,
     **kwargs
 ):
     if rule is None:
@@ -81,7 +81,7 @@ def simple_script(
     script_task(
         url=url,
         quality=quality,
-        allow_child_script=allow_child_script,
+        prevent=prevent,
         **kwargs
     ).run()
 
@@ -93,14 +93,14 @@ def script_request(
     url: str,
     rule: Optional[Union[str, int]] = None,
     *,
-    allow_child_script: bool = False,
+    prevent: bool = False,
     **kwargs
 ):
     """
     Args:
         url: 目标URL
         rule: 选择规则
-        allow_child_script: 是否允许子脚本请求
+        prevent: 是否允许子脚本请求
 
     """
 

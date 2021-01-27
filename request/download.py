@@ -33,6 +33,19 @@ async def download(
             [{'uri': 'http://xxx', 'headers': headers}, ...]
 
     """
+    def speed():
+        nonlocal dl
+        transfer_rate = dl.transfer_rate()
+        unitdict = {
+            'GB/s': 1024 * 1024 * 1024,
+            'MB/s': 1024 * 1024,
+            'KB/s': 1024,
+            'B/s': 1,
+        }
+        for k, v in unitdict.items():
+            if transfer_rate > v:
+                return f'{round(transfer_rate / v, 2)} {k}'
+        return f'{round(transfer_rate / v, 2)} B/s'
     # 创建下载请求对象
     tempf = ctx.tempdir.mktemp()
     dlr = DlRequest(file_path=tempf.filepath)
@@ -54,7 +67,7 @@ async def download(
         )
         ctx.set_percent(dl.percent_complete)
         ctx.set_timeleft(dl.remaining_time)
-        ctx.set_speed(lambda: dl.transfer_rate())
+        ctx.set_speed(speed)
 
         dl.start(loop=asyncio.get_running_loop())
         # FIX: Nbdler 下载器在协程下出现的问题
@@ -84,13 +97,14 @@ async def download(
 
 
 @requester('download', weight=1, infomodel=DownloadDataModel)
-async def easy_download(
+async def stream_download(
     uri: str = None,
     headers: Dict = None,
     buffsize: float = 1024 * 1024,
     timeout: float = None,
     **kwargs
 ):
+    """ 文件流下载，通常用于下载具有实时性的数据。 """
     def stop():
         nonlocal stop_flag
         stop_flag = True
@@ -112,7 +126,12 @@ async def easy_download(
             if avgspeed > v:
                 return f'{round(avgspeed / v, 2)} {k}'
         return f'{avgspeed} B/s'
-    ctx.glb.task.show()
+
+    def percent():
+        nonlocal total_size
+        return sizecnt / total_size
+
+    maxsize = ctx.script.config['maxsize']
     stop_event = threading.Event()
     stop_flag = False
     ctx.add_stopper(stop)
@@ -124,10 +143,19 @@ async def easy_download(
                 headers=headers,
                 **kwargs
             )
+            if resp.status not in (200, 206):
+                raise ConnectionAbortedError()
+
             chunksize = 1024 * 4
             sizecnt = 0
             avgspeed = 0
             starttime = time.time()
+            if resp.content_length is None:
+                # 不确定的进度
+                ctx.set_percent(None)
+            else:
+                total_size = resp.content_length
+                ctx.set_percent(percent)
 
             buffcnt = 0
             buff_lst = []
@@ -137,23 +165,31 @@ async def easy_download(
                 dstpath=tempf.filepath,
             )
             with tempf('wb') as f:
-                async for chunk in resp.content.iter_chunked(chunksize):
-                    # 已下载文件大小
-                    chunklen = len(chunk)
-                    sizecnt += chunklen
-                    buffcnt += chunklen
-                    buff_lst.append(chunk)
-                    # 缓冲溢出后写入文件
-                    if buffcnt >= buffsize:
-                        f.writelines(buff_lst)
-                        buffcnt = 0
-                        buff_lst = []
-                    # 计算平均下载速度
-                    avgspeed = sizecnt / ((time.time() - starttime) or float('inf'))
+                try:
+                    async for chunk in resp.content.iter_chunked(chunksize):
+                        # 已下载文件大小
+                        chunklen = len(chunk)
+                        sizecnt += chunklen
+                        buffcnt += chunklen
+                        buff_lst.append(chunk)
+                        # 缓冲溢出后写入文件
+                        if buffcnt >= buffsize:
+                            f.writelines(buff_lst)
+                            buffcnt = 0
+                            buff_lst = []
+                        # 计算平均下载速度
+                        avgspeed = sizecnt / ((time.time() - starttime) or float('inf'))
 
-                    if stop_flag:
-                        stop_event.set()
-                        break
+                        if stop_flag:
+                            stop_event.set()
+                            break
+
+                        # 切割视频
+                        if maxsize <= sizecnt:
+                            raise Warning()
+                finally:
+                    if buff_lst:
+                        f.writelines(buff_lst)
     finally:
         stop_flag = True
         stop_event.set()

@@ -1,4 +1,5 @@
 from .base import ConfMeta
+from urllib.parse import urlparse
 
 
 class ApplicationConf(
@@ -13,7 +14,7 @@ class ApplicationConf(
     # app 选项
     module: str
     entrypoint: str
-    gateway: str
+    gateway: urlparse
 
     host: str
     port: int

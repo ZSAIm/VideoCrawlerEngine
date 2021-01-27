@@ -9,7 +9,7 @@ License:    Apache-2.0
 ==================================
 """
 from app.script import ScriptBaseClass
-from request.download import download, easy_download
+from request.download import download, stream_download
 from request.ffmpeg import ffmpeg
 from request import option, optional
 from helper.payload import export_func, Concurrent
@@ -387,7 +387,7 @@ class BilibiliLive(ScriptBaseClass):
                         uris.append(url)
 
                     options.append(option(
-                        easy_download(uris.pop(), headers=headers),
+                        stream_download(uris.pop(), headers=headers),
                         descriptions=desc
                     ))
 

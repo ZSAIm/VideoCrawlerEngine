@@ -34,20 +34,24 @@ async def start_task(
             script['key']: f'{id(script_req):x}',
             script['config']: script_req.getdata('config', {}),
             script['basecnf']: dict(get_conf('script')['base']),
+            # 方便获取脚本数据
+            script['__getitem__']: script_req.__getitem__,
         }
         with ExitStack() as stack:
-            contexts = [
+            for ctxmgr, value in ctxmgr_value.items():
                 stack.enter_context(ctxmgr.apply(value))
-                for ctxmgr, value in ctxmgr_value.items()
-            ]
+
             stack.enter_context(layer)
             async with sema:
                 return await layer.run()
 
+    async def _stop():
+        return await asyncio.wait([layer.stop() for layer in [scriptlay] + subscripts])
+
     script_req = script_request(
         url=url,
         rule=rule,
-        allow_child_script=False
+        prevent=False,
     )
 
     scriptlay = ScriptLayer(script_req)
@@ -58,16 +62,19 @@ async def start_task(
     ctx.upload(
         title=script_req.getdata('title'),
         url=script_req.getdata('url'),
+        name=script_req.getdata('name'),
+        roots=[scriptlay.script] + [s.script for s in subscripts],
+        root_layers=[scriptlay] + subscripts
     )
 
-    max_workers = 1
+    max_workers = 3
     sema = asyncio.Semaphore(max_workers)
     tasks = [
         asyncio.create_task(_worker(i, s))
         for i, s in enumerate([scriptlay] + subscripts)
     ]
     # 使用当前任务协程事件循环来停止任务
-    ctx.add_stopper(scriptlay.stop)
+    ctx.add_stopper(_stop)
     return await asyncio.wait(tasks)
 
 

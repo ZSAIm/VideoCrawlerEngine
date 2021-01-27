@@ -200,6 +200,8 @@ def select_script(scripts):
     """ 该方法会返回列表中优先级最高的脚本。"""
     def latest_version(name_version):
         return (get_conf('script').get(split_name_version(name_version)[0]) or {'order': 0})['order']
+    if not scripts:
+        return None
     return max(scripts, key=latest_version)
 
 

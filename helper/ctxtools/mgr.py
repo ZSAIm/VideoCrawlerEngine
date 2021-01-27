@@ -1,30 +1,67 @@
 from contextlib import contextmanager
 from contextvars import ContextVar, copy_context as _copy_context, Token
 from typing import Union, Any, TypeVar
+from functools import wraps
 
 
 class Undefined(object):
     pass
 
 
-undefined = Undefined()
+UNDEFINED = Undefined()
 
 __global_context__ = {}
 
 
+def _inline_context_apply(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        result = func(self, *args, **kwargs)
+        if self.inline:
+            scope = __scope__.get()
+            self.old_value = scope.get(self.name, UNDEFINED)
+            scope.update({
+                self.name: self.get()
+            })
+        return result
+    return wrapper
+
+
+def _inline_context_reset(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        result = func(self, *args, **kwargs)
+        if self.inline:
+            if self.old_value is not UNDEFINED:
+                __scope__.get()[self.name] = self.old_value
+            self.old_value = UNDEFINED
+        return result
+    return wrapper
+
+
 class GlobalContext:
-    def __init__(self, name, namespace='', default=undefined):
+    def __init__(
+        self,
+        name: str,
+        namespace: str = '',
+        default: Union[Any, Undefined] = UNDEFINED,
+        inline: bool = False
+    ):
         self.value = None
         self.name = '.'.join(([namespace] if namespace else []) + [name])
         self.entered = False
         self.default = default
+        self.inline = inline
+        self.old_value = UNDEFINED
 
+    @_inline_context_apply
     def apply(self, value):
         self.entered = True
         self.value = value
         __global_context__[self.name] = self.value
         return self
 
+    @_inline_context_reset
     def reset(self):
         del __global_context__[self.name]
         self.value = None
@@ -36,7 +73,7 @@ class GlobalContext:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.reset()
 
-    def get(self, default=undefined):
+    def get(self, default=UNDEFINED):
         # assert self.entered
         if not self.entered:
             default = default if isinstance(default, Undefined) else self.default
@@ -54,27 +91,37 @@ def context_var(name, *, default=None, has_default):
 
 
 class ContextManager:
-    def __init__(self, name, namespace='', default: Union[Any, Undefined] = undefined):
+    def __init__(
+        self,
+        name: str,
+        namespace: str = '',
+        default: Union[Any, Undefined] = UNDEFINED,
+        inline: bool = False
+    ):
         self.context = context_var(
             '.'.join(([namespace] if namespace else []) + [name]),
             default=[None, default], has_default=not isinstance(default, Undefined)
         )
+        self.inline = inline
+        self.old_value = UNDEFINED
 
     @property
     def name(self):
         return self.context.name
 
+    @_inline_context_apply
     def apply(self, value):
         values = [None, value]
         token = self.context.set(values)
         values[0] = token
         return self
 
+    @_inline_context_reset
     def reset(self):
         token, value = self.context.get()
         self.context.reset(token)
 
-    def get(self, default: Union[Undefined, Any] = undefined):
+    def get(self, default: Union[Undefined, Any] = UNDEFINED):
         try:
             return self.context.get()[-1]
         except LookupError:
@@ -110,16 +157,19 @@ class AttributeContext:
         self,
         name: str,
         namespace: str = '',
-        default: Union[Any, Undefined] = undefined
+        default: Union[Any, Undefined] = UNDEFINED,
+        inline: bool = False
     ):
         *basename, objname = name.rsplit('.', 1)
         self.getter = ContextManager(
             '.'.join(([namespace] if namespace else []) + basename + [f'get_{objname}']),
-            default=default
+            default=default,
+            inline=inline
         )
         self.setter = ContextManager(
             '.'.join(([namespace] if namespace else []) + basename + [f'set_{objname}']),
-            default=default
+            default=default,
+            inline=inline
         )
         self.name = name
 
@@ -164,7 +214,8 @@ class ObjectMappingContext:
         attrs: str = '',
         meths: str = '',
         namespace: str = '',
-        default: Union[Any, Undefined] = undefined
+        default: Union[Any, Undefined] = UNDEFINED,
+        inline: bool = False
     ):
         if isinstance(attrs, str):
             attrs = [name.strip() for name in attrs.split(' ') if name.strip()]
@@ -175,13 +226,15 @@ class ObjectMappingContext:
         self.attrs = {
             name: AttributeContext(
                 '.'.join([namespace, name]) if namespace else name,
-                default=default
+                default=default,
+                inline=inline
             ) for name in attrs
         }
         self.meths = {
             name: ContextManager(
                 '.'.join([namespace, name]) if namespace else name,
-                default=default
+                default=default,
+                inline=inline
             ) for name in meths
         }
 
@@ -226,19 +279,19 @@ class ContextNamespace:
         self.namespace = namespace
         self.__context = {}
 
-    def contextmanager(self, name, default: Union[Undefined, Any] = undefined):
+    def contextmanager(self, name, default: Union[Undefined, Any] = UNDEFINED):
         """ 创建一个上下文管理器。"""
         context = ContextManager(name, self.namespace, default)
         self.__context[name] = context
         return context
 
-    def attributecontext(self, name, default: Union[Undefined, Any] = undefined):
+    def attributecontext(self, name, default: Union[Undefined, Any] = UNDEFINED):
         """ 创建一个属性上下文管理器。"""
         context = AttributeContext(name, self.namespace, default)
         self.__context[name] = context
         return context
 
-    def objectmappingcontext(self, attr: str = '', meths: str = '', default: Union[Undefined, Any] = undefined):
+    def objectmappingcontext(self, attr: str = '', meths: str = '', default: Union[Undefined, Any] = UNDEFINED):
         """ 创建一个对象方法映射上下文管理器。"""
         context = ObjectMappingContext(attr, meths, self.namespace, default)
         for name in list(context.attrs.keys()) + list(context.meths.keys()):
@@ -383,7 +436,7 @@ T = TypeVar('T')
 
 def get_ctx(
     context: Union[_InvokeChain, T],
-    default: Union[Undefined, Any] = undefined
+    default: Union[Undefined, Any] = UNDEFINED
 ) -> T:
     if isinstance(context, _InvokeChain):
         if not isinstance(default, Undefined):

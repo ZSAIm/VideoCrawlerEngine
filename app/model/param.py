@@ -1,24 +1,6 @@
 from pydantic import Field
 from pydantic.main import BaseModel
-from typing import List, Dict, Union, Any, Tuple
-
-
-class TaskCreateParams(BaseModel):
-    pass
-
-
-class StopTaskParams(BaseModel):
-    pass
-
-
-class TaskCreateParams(BaseModel):
-    pass
-
-
-class CreateTaskParams(BaseModel):
-    pass
-
-
+from typing import List, Dict, Union, Any, Tuple, Optional
 
 
 class GetSupportedParams(BaseModel):
@@ -54,11 +36,24 @@ class RemoteApplyParams(BaseModel):
     kwargs: Dict = Field(title='字典参数')
 
 
-class NewTaskParams(BaseModel):
-    url: str = Field(title='URL链接')
-    options: Dict[str, Any] = Field(title='配置选项', default={})
+class NewTasksListParams(BaseModel):
+    """ 创建任务参数。"""
+    urls: List[str] = Field(title='URLs列表')
+    options: Dict = Field(title='配置选项', default={})
+
+
+class StopTaskParams(BaseModel):
+    """ 暂停任务参数。"""
+    keys: List[str] = Field(title='任务KEY列表')
+
+
+class RestartTaskParams(BaseModel):
+    """ 重试任务参数。"""
+    keys: List[str] = Field(title='任务KEY列表')
 
 
 class ListTaskParams(BaseModel):
+    """ 任务状态列表参数。"""
     offset: int = Field(title='任务列表偏移（起始位置）', default=0)
     limit: int = Field(title='返回条数', default=20)
+    active: Optional[str] = Field(title='选择的任务KEY', default=None)

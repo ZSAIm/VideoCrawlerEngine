@@ -9,5 +9,4 @@ def get_client(name):
     module_name = f'helper.client.{name}'
     if not sys.modules.get(module_name):
         importlib.import_module(module_name)
-
     return _get_client(name)()

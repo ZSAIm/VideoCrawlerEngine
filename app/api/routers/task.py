@@ -3,7 +3,6 @@
 from fastapi import APIRouter, Depends
 # from model.task import TasksCreateModel, TaskBaseModel, StopTaskModel
 from app.model.param import (
-    CreateTaskParams,
     StopTaskParams,
 
 )

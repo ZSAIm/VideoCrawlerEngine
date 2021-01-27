@@ -1,0 +1,21 @@
+/* .v-dialog {
+    border-radius: 0;
+}
+ */
+
+::-webkit-scrollbar {
+    width: 1rem;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #2525252b;
+    transition: background-color 5s;
+    -webkit-transition: background-color 5s;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #4242422b;
+    transition: background-color 5s;
+    -webkit-transition: background-color 5s;
+}

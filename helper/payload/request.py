@@ -1,10 +1,4 @@
-from helper.codetable import (
-    REQ_READY,
-    REQ_QUEUING,
-    REQ_RUNNING,
-    REQ_ERROR,
-    REQ_DONE,
-)
+from helper.codetable import NodeState
 from helper.ctxtools.mgr import copy_context_to_dict
 from inspect import getfullargspec, iscoroutinefunction
 from helper.ctxtools.vars.request import (
@@ -42,7 +36,7 @@ import asyncio
 T = TypeVar('T')
 
 
-def binding_property(name: str):
+def inline_prop(name: str):
     def setter(self, value: Union[Callable[[], T], T]) -> None:
         setattr(self, name, value)
 
@@ -61,15 +55,15 @@ class Progress(object):
     data: Dict
     logs: List
 
-    __status__: str = REQ_READY
+    __status__: str = NodeState.READY
     __percent__: float = 0
     __speed__: Union[float, str, int] = 0
     __timeleft__: float = float('inf')
 
-    status = binding_property('__status__')
-    percent = binding_property('__percent__')
-    speed = binding_property('__speed__')
-    timeleft = binding_property('__timeleft__')
+    status = inline_prop('__status__')
+    percent = inline_prop('__percent__')
+    speed = inline_prop('__speed__')
+    timeleft = inline_prop('__timeleft__')
 
     def __init__(self):
         self.data = {}
@@ -83,11 +77,13 @@ class Progress(object):
 
     def stop(self):
         """ """
-        if self.status in (REQ_RUNNING, REQ_QUEUING):
+        if self.status in (NodeState.RUNNING, NodeState.QUEUING):
             self.stopmaker.run()
 
     def getdata(self, key, default=None):
         result = self.data.get(key, default)
+        if callable(result):
+            result = result()
         return result
 
     def iterdata(self):
@@ -97,12 +93,15 @@ class Progress(object):
         for k, v in kwargs.items():
             self.data[k] = v
 
+    def commit(self, item):
+        pass
+
     def enqueue(self):
-        self.status = REQ_QUEUING
+        self.status = NodeState.QUEUING
         self.percent = 0
 
     def start(self):
-        self.status = REQ_RUNNING
+        self.status = NodeState.RUNNING
         self.percent = 0
         self.timeleft = float('inf')
 
@@ -110,13 +109,13 @@ class Progress(object):
         self.stopmaker.destroy()
 
     def task_done(self):
-        if self.status == REQ_RUNNING:
-            self.__status__ = REQ_DONE
+        if self.status == NodeState.RUNNING:
+            self.__status__ = NodeState.DONE
             self.percent = 100
             self.timeleft = 0
 
     def error(self, message):
-        self.status = REQ_ERROR
+        self.status = NodeState.ERROR
         self.report('ERROR: ' + message)
 
     def success(self, message):
@@ -133,7 +132,7 @@ class Progress(object):
         self.logs.append(message)
 
     def __repr__(self):
-        msg = '\n'.join([
+        msg = ' '.join([
             f'status={self.status}',
             f'percent={self.percent}',
             f'speed={self.speed}',
@@ -206,17 +205,6 @@ class Requester(FlowPayload):
             k: self.getdata(k)
             for k in self.__infomodel__.__fields__.keys()
         }
-
-    # def after(self, __fn, *args, **kwargs):
-    #     if iscoroutinefunction(__fn):
-    #         worker = get_worker('async_after')
-    #     else:
-    #         worker = get_worker('after')
-    #     return executor.submit(
-    #         worker,
-    #         args=(__fn, *args),
-    #         kwargs=kwargs
-    #     )
 
     async def stop(self) -> None:
         return await executor.submit(

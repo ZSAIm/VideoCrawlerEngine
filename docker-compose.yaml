@@ -23,7 +23,7 @@ services:
 
     depends_on:
       - mysql
-    container_name: vce_task
+    container_name: vce_taskflow
 
   script:
     build:

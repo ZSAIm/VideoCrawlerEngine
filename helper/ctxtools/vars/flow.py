@@ -53,9 +53,9 @@ flow = ContextNamespace('flow')
 flow_mgr = flow.objectmappingcontext(
     attr='branch key',
     meths="""
-    run_async add get_by_a5g get_subflow
-    find_by_name iternodes enter_node enter_layer
-    
+    run_async mount_node get_by_a5g get_subflow
+    find_by_name iternodes enter_node enter_layer 
+    enter_root
     """,
 )
 flow.contextmanager('__layer__')

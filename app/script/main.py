@@ -58,12 +58,14 @@ def main():
     init_worker()
 
     conf = get_conf('app').script
+    gateway = conf['gateway']
     host = conf.get('host', None)
     port = conf.get('port', None)
     if not host:
-        gateway = urlparse(conf['gateway'])
+    #     gateway = urlparse(conf['gateway'])
+    #     host = gateway.hostname
+    #     port = gateway.port
         host = gateway.hostname
         port = gateway.port
-
     uvicorn.run(app, host=host, port=port)
 

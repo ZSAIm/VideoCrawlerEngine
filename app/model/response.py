@@ -8,6 +8,7 @@ from app.model.data import (
     TaskModel,
     ApplyModel,
     ListTaskModel,
+    StopTaskModel,
 )
 
 
@@ -23,21 +24,27 @@ class RegisterResp(APIRespModel):
     pass
 
 
-class ExecuteScriptResp(APIRespModel):
-    data: Dict = Field(title='脚本执行响应。')
-
-
-class NewTaskResp(APIRespModel):
-    data: List[TaskModel] = Field(title='新建任务响应。')
-
-
 class RemoteApplyResp(APIRespModel):
     data: ApplyModel = Field(title='调用响应')
 
 
-class ListTaskResp(APIRespModel):
+class NotImplementResp(APIRespModel):
+    data: Dict = Field(title='接口未实现。')
+
+
+class ExecuteScriptResp(APIRespModel):
+    data: Dict = Field(title='脚本执行响应。')
+
+
+class NewTasksResp(APIRespModel):
+    data: List[TaskModel] = Field(title='新建任务响应。')
+
+
+class StopTasksResp(APIRespModel):
+    data: List[StopTaskModel] = Field(title='暂停任务响应')
+
+
+class ListTasksResp(APIRespModel):
     data: List[ListTaskModel] = Field(title='任务列表。')
 
 
-class NotImplementResp(APIRespModel):
-    data: Dict = Field(title='接口未实现。')

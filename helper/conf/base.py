@@ -1,6 +1,9 @@
 
 from configparser import ConfigParser
 from typing import Any
+import re
+
+_REG_FILESIZE = re.compile(r'([\d.]+)([a-zA-Z]+)?')
 
 _NAME_CONF = {}
 
@@ -42,13 +45,19 @@ class ConfMeta(type):
         confname = kwargs['name']
         # 加载配置文件
         parser = ConfigParser()
-        result = parser.read(file)
+        result = parser.read(file, encoding='utf-8')
         new_namespace = mcs_namespace.copy()
 
         # 标注类型
         annotations = mcs_namespace.get('__annotations__', {})
         annotations.update(mcs_namespace.get('__items__', {}))
         sections = {}
+        basetype_convertor = {
+            int: Integer(),
+            str: String(),
+            float: Float(),
+            bool: Boolean(),
+        }
         for sec_name, sec in parser.items():
             if sec_name == parser.default_section and not len(sec.keys()):
                 continue
@@ -56,16 +65,10 @@ class ConfMeta(type):
             for k in sec.keys():
                 ty = annotations.get(k, None)
                 if ty:
-                    basetype_convert = {
-                        int: Integer(),
-                        str: String(),
-                        float: Float(),
-                        bool: Boolean(),
-                    }
-                    conv = basetype_convert.get(ty, None)
+                    conv = basetype_convertor.get(ty, None)
                     if not conv:
                         conv = ty
-                    if not isinstance(conv, ItemType):
+                    if not callable(conv):
                         raise TypeError(f'item的{type(ty)}类型无法处理。')
                     try:
                         value = conv(sec.get(k))
@@ -145,4 +148,23 @@ class List(ItemType):
         self.sep = sep
 
     def __call__(self, origin: str) -> list:
-        return list(origin.split(self.sep))
+        return origin.split(self.sep)
+
+
+class FileSize(ItemType):
+    """ 文件大小格式化。"""
+    def __call__(self, origin: str) -> float:
+        size, fm = _REG_FILESIZE.search(origin.strip()).groups()
+        size = float(size)
+
+        scale = {
+            'g': 1024 * 1024 * 1024,
+            'gb': 1024 * 1024 * 1024,
+            'm': 1024 * 1024,
+            'mb': 1024 * 1024,
+            'k': 1024,
+            'kb': 1024,
+            'b': 1,
+            '': 1
+        }[(fm or '').lower()]
+        return size * scale

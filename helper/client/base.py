@@ -56,13 +56,6 @@ class APIRequestMethod:
 
     def _unpack_model_response(self, resp: requests.Response):
         res_json = resp.json()
-        # result = self.response_model(**res_json)
-        # if result.code != SUCCESS:
-        #     raise ClientResponseError(result.msg)
-        # data = result.data
-        # if result.fields['data'].field_info.max_items == 1:
-        #     # 指定最大列表数==1的表明是单结果数据，若为空则返回None
-        #     return (data and data[0]) or None
         if res_json['code'] != SUCCESS:
             raise ClientResponseError(res_json['msg'])
         return res_json['data']
@@ -171,7 +164,7 @@ class APIClientMeta(type):
             ] if h]
             new_namespace[route.name] = APIRequestMethod(
                 session=session,
-                gateway=get_conf('app')[server_name]['gateway'],
+                gateway=get_conf('app')[server_name]['gateway'].geturl(),
                 path=route.path,
                 methods=route.methods,
                 doc=route.endpoint.__doc__,

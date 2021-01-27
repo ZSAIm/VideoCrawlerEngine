@@ -30,6 +30,7 @@ class SubmitEntrypoint(Entrypoint):
 
     def run(self, __context, __fn, *args, **kwargs):
         # with run_context_from_dict(self.context):
+        print(__fn)
         with run_context_from_dict(__context):
             try:
                 result = __fn(*args, **kwargs)
@@ -40,6 +41,7 @@ class SubmitEntrypoint(Entrypoint):
 
     async def arun(self, __context, __fn, *args, **kwargs):
         # with run_context_from_dict(self.context):
+        print(__fn)
         with run_context_from_dict(__context):
             try:
                 result = await __fn(*args, **kwargs)

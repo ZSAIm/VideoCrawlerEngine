@@ -7,14 +7,14 @@ from .flow import (
 from .script import (
     ScriptLayer,
 )
-from .work import (
-    WorkLayer,
+from .node import (
+    NodeLayer,
 )
 
 
 __all__ = [
     'SerialLayer',
     'ParallelLayer',
-    'WorkLayer',
+    'NodeLayer',
     'ScriptLayer'
 ]

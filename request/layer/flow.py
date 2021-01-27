@@ -5,7 +5,7 @@ from contextlib import ExitStack
 
 from helper.payload import FlowPayload, gen_linear_flow, Requester
 from .base import BaseLayer
-from .work import WorkLayer
+from .node import NodeLayer
 from typing import List, Tuple, Union, Any, Sequence
 from helper.worker import get_worker, executor
 from helper.ctxtools import ctx
@@ -202,7 +202,7 @@ def _unwrap_serial_flows(depth: int, flow: FlowPayload, *args, **kwargs):
         # 串行层的下一层是并行层
         return ParallelLayer(depth + 1, list(flow), *args, **kwargs)
     else:
-        return WorkLayer(depth, flow, *args, **kwargs)
+        return NodeLayer(depth, flow, *args, **kwargs)
 
 
 def _unwrap_parallel_flows(depth: int, flow: FlowPayload, *args, **kwargs):
@@ -212,7 +212,7 @@ def _unwrap_parallel_flows(depth: int, flow: FlowPayload, *args, **kwargs):
         return SerialLayer(depth, list(flow), *args, **kwargs)
     else:
         #
-        return WorkLayer(depth, flow, *args, **kwargs)
+        return NodeLayer(depth, flow, *args, **kwargs)
 
 
 class SubFlowLayer(BaseLayer):

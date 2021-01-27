@@ -15,7 +15,7 @@ class APIBaseError(Exception):
 
     def __init__(self, msg, data=None):
         self.msg = msg
-        self.data = data or []
+        self.data = data
 
 
 class PageOutOfRange(APIBaseError):

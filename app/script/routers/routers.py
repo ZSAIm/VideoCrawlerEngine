@@ -30,6 +30,7 @@ from helper.payload import dictify_payload
 from helper.ctxtools.mgr import get_ctx
 from helper.ctxtools import ctx
 from request.export import stack_function
+from exception import DataNotFound
 from traceback import format_exc
 script_router = APIRouter()
 stack_router = APIRouter()
@@ -92,6 +93,8 @@ async def exec_script(
     param: ExecuteScriptParams,
 ):
     script_name = select_script(supported_script(param.url))
+    if not script_name:
+        raise DataNotFound(f'找不到处理该链接的脚本。{param.url}')
     script_task = get_script(script_name)
 
     req = simple_script(
@@ -104,6 +107,13 @@ async def exec_script(
         # data=[dictify_payload(dict(req.iter_data()))]
         data=dictify_payload(result)
     )
+
+
+@stack_router.post(
+    '/preview'
+)
+async def preview():
+    pass
 
 
 @stack_router.post(
@@ -153,3 +163,5 @@ async def hit_stack(
 
 ):
     raise NotImplementedError()
+
+
