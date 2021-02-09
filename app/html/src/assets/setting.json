@@ -1,0 +1,810 @@
+[{
+        "title": "app",
+        "name": "app",
+        "groups": [{
+                "title": "global",
+                "name": "global",
+                "items": [{
+                    "title": "开启调试模式",
+                    "name": "debug",
+                    "type": "Boolean",
+                    "desc": "",
+                    "value": "yes"
+                }]
+            },
+            {
+                "title": "html",
+                "name": "html",
+                "items": [{
+                    "title": "前端HTML路径",
+                    "name": "dist",
+                    "type": "FileRealPath",
+                    "desc": "",
+                    "value": "D:\\GitHub\\VideoCrawlerEngine\\app\\html\\dist"
+                }]
+            },
+            {
+                "title": "api",
+                "name": "api",
+                "items": [{
+                        "title": "应用模块文件",
+                        "name": "module",
+                        "type": "String",
+                        "desc": "",
+                        "value": "app.api.main"
+                    },
+                    {
+                        "title": "应用入口",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "main"
+                    },
+                    {
+                        "title": "应用网关URL",
+                        "name": "gateway",
+                        "type": "UrlParse",
+                        "desc": "",
+                        "value": "http://127.0.0.1:2333"
+                    },
+                    {
+                        "title": "",
+                        "name": "token",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "title": "taskflow",
+                "name": "taskflow",
+                "items": [{
+                        "title": "应用模块文件",
+                        "name": "module",
+                        "type": "String",
+                        "desc": "",
+                        "value": "app.taskflow.main"
+                    },
+                    {
+                        "title": "应用入口",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "main"
+                    },
+                    {
+                        "title": "应用网关URL",
+                        "name": "gateway",
+                        "type": "UrlParse",
+                        "desc": "",
+                        "value": "http://127.0.0.1:2332"
+                    },
+                    {
+                        "title": "",
+                        "name": "token",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "title": "script",
+                "name": "script",
+                "items": [{
+                        "title": "应用模块文件",
+                        "name": "module",
+                        "type": "String",
+                        "desc": "",
+                        "value": "app.script.main"
+                    },
+                    {
+                        "title": "应用入口",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "main"
+                    },
+                    {
+                        "title": "应用网关URL",
+                        "name": "gateway",
+                        "type": "UrlParse",
+                        "desc": "",
+                        "value": "http://127.0.0.1:2331"
+                    },
+                    {
+                        "title": "",
+                        "name": "token",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title": "script",
+        "name": "script",
+        "groups": [{
+                "title": "repo",
+                "name": "repo",
+                "items": [{
+                        "title": "",
+                        "name": "base.py",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "",
+                        "name": "bilibili.py",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "title": "base",
+                "name": "base",
+                "items": [{
+                        "title": "脚本优先级",
+                        "name": "order",
+                        "type": "Integer",
+                        "desc": "",
+                        "value": "100"
+                    },
+                    {
+                        "title": "预载Cookies",
+                        "name": "cookies",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "预载代理Proxies",
+                        "name": "proxies",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "指定版本",
+                        "name": "active",
+                        "type": "Float",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "默认选择规则",
+                        "name": "default_rule",
+                        "type": "Integer",
+                        "desc": "指定范围0-100：0表示最低；100表示最高。(具体排序取决于脚本结果)",
+                        "value": "1"
+                    },
+                    {
+                        "title": "目标格式",
+                        "name": "to_format",
+                        "type": "List",
+                        "desc": "",
+                        "value": "mp4|mkv"
+                    },
+                    {
+                        "title": "追加处理器",
+                        "name": "append",
+                        "type": "List",
+                        "desc": "",
+                        "value": "checkpoint,cleanup"
+                    },
+                    {
+                        "title": "严格转码",
+                        "name": "convert_strict",
+                        "type": "Boolean",
+                        "desc": "若真则对视频进行严格转码（耗时长），否则使用快速转码",
+                        "value": "no"
+                    }
+                ]
+            },
+            {
+                "title": "bilibili",
+                "name": "bilibili",
+                "items": [{
+                        "title": "脚本优先级",
+                        "name": "order",
+                        "type": "Integer",
+                        "desc": "",
+                        "value": "100"
+                    },
+                    {
+                        "title": "预载Cookies",
+                        "name": "cookies",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "预载代理Proxies",
+                        "name": "proxies",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "指定版本",
+                        "name": "active",
+                        "type": "Float",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "默认选择规则",
+                        "name": "default_rule",
+                        "type": "Integer",
+                        "desc": "指定范围0-100：0表示最低；100表示最高。(具体排序取决于脚本结果)",
+                        "value": "1"
+                    },
+                    {
+                        "title": "目标格式",
+                        "name": "to_format",
+                        "type": "List",
+                        "desc": "",
+                        "value": "mp4|mkv"
+                    },
+                    {
+                        "title": "追加处理器",
+                        "name": "append",
+                        "type": "List",
+                        "desc": "",
+                        "value": "checkpoint,cleanup"
+                    }
+                ]
+            },
+            {
+                "title": "bilibili-live",
+                "name": "bilibili-live",
+                "items": [{
+                        "title": "脚本优先级",
+                        "name": "order",
+                        "type": "Integer",
+                        "desc": "",
+                        "value": "100"
+                    },
+                    {
+                        "title": "预载Cookies",
+                        "name": "cookies",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "预载代理Proxies",
+                        "name": "proxies",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "指定版本",
+                        "name": "active",
+                        "type": "Float",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "默认选择规则",
+                        "name": "default_rule",
+                        "type": "Integer",
+                        "desc": "指定范围0-100：0表示最低；100表示最高。(具体排序取决于脚本结果)",
+                        "value": "1"
+                    },
+                    {
+                        "title": "目标格式",
+                        "name": "to_format",
+                        "type": "List",
+                        "desc": "",
+                        "value": "mp4|mkv"
+                    },
+                    {
+                        "title": "追加处理器",
+                        "name": "append",
+                        "type": "List",
+                        "desc": "",
+                        "value": "cleanup"
+                    },
+                    {
+                        "title": "",
+                        "name": "maxsize",
+                        "type": "FileSize",
+                        "desc": "",
+                        "value": "1g"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title": "taskflow",
+        "name": "taskflow",
+        "groups": [{
+            "title": "global",
+            "name": "global",
+            "items": [{
+                    "title": "",
+                    "name": "savedir",
+                    "type": "String",
+                    "desc": "",
+                    "value": "d:/video"
+                },
+                {
+                    "title": "",
+                    "name": "tempdir",
+                    "type": "String",
+                    "desc": "",
+                    "value": ""
+                },
+                {
+                    "title": "",
+                    "name": "default_rule",
+                    "type": "Integer",
+                    "desc": "",
+                    "value": "100"
+                },
+                {
+                    "title": "",
+                    "name": "trust",
+                    "type": "String",
+                    "desc": "",
+                    "value": "yes"
+                },
+                {
+                    "title": "",
+                    "name": "to_format",
+                    "type": "List",
+                    "desc": "",
+                    "value": "mp4|mkv"
+                },
+                {
+                    "title": "",
+                    "name": "logdir",
+                    "type": "String",
+                    "desc": "",
+                    "value": "./logs"
+                }
+            ]
+        }]
+    },
+    {
+        "title": "payload",
+        "name": "payload",
+        "groups": [{
+                "title": "stopper",
+                "name": "stopper",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "10"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "no"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "submit"
+                    }
+                ]
+            },
+            {
+                "title": "async_stopper",
+                "name": "async_stopper",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "inf"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "yes"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "submit"
+                    }
+                ]
+            },
+            {
+                "title": "function",
+                "name": "function",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "3"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "no"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "requester"
+                    }
+                ]
+            },
+            {
+                "title": "remote_apply",
+                "name": "remote_apply",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "3"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "no"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "submit"
+                    }
+                ]
+            },
+            {
+                "title": "subflow",
+                "name": "subflow",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "3"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "yes"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "submit"
+                    }
+                ]
+            },
+            {
+                "title": "task",
+                "name": "task",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "3"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "yes"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "requester"
+                    }
+                ]
+            },
+            {
+                "title": "script",
+                "name": "script",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "3"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "no"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "requester"
+                    }
+                ]
+            },
+            {
+                "title": "download",
+                "name": "download",
+                "items": [{
+                        "title": "",
+                        "name": "engine",
+                        "type": "String",
+                        "desc": "",
+                        "value": "Nbdler"
+                    },
+                    {
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "5"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "yes"
+                    },
+                    {
+                        "title": "",
+                        "name": "max_speed",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "",
+                        "name": "timeout",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "",
+                        "name": "max_retries",
+                        "type": "String",
+                        "desc": "",
+                        "value": "10"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "requester"
+                    }
+                ]
+            },
+            {
+                "title": "ffmpeg",
+                "name": "ffmpeg",
+                "items": [{
+                        "title": "",
+                        "name": "engine",
+                        "type": "String",
+                        "desc": "",
+                        "value": "ffmpeg"
+                    },
+                    {
+                        "title": "",
+                        "name": "name",
+                        "type": "String",
+                        "desc": "",
+                        "value": "ffmpeg"
+                    },
+                    {
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "5"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "yes"
+                    },
+                    {
+                        "title": "",
+                        "name": "source",
+                        "type": "String",
+                        "desc": "",
+                        "value": ""
+                    },
+                    {
+                        "title": "",
+                        "name": "overwrite",
+                        "type": "String",
+                        "desc": "",
+                        "value": "yes"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "requester"
+                    }
+                ]
+            },
+            {
+                "title": "checkpoint",
+                "name": "checkpoint",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "3"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "yes"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "requester"
+                    }
+                ]
+            },
+            {
+                "title": "live",
+                "name": "live",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "5"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "yes"
+                    },
+                    {
+                        "title": "独占线程",
+                        "name": "meonly",
+                        "type": "Boolean",
+                        "desc": "若开启则该负载将使用独立的线程进行处理，不与其他载荷共享处理线程。",
+                        "value": "yes"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "requester"
+                    }
+                ]
+            },
+            {
+                "title": "after",
+                "name": "after",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "3"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "no"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "requester"
+                    }
+                ]
+            },
+            {
+                "title": "async_after",
+                "name": "async_after",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "3"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "no"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "requester"
+                    }
+                ]
+            },
+            {
+                "title": "cleanup",
+                "name": "cleanup",
+                "items": [{
+                        "title": "最大并发量",
+                        "name": "max_concurrent",
+                        "type": "Integer",
+                        "desc": "限制载荷的最大并发量。inf表示不做限制。",
+                        "value": "3"
+                    },
+                    {
+                        "title": "异步载荷",
+                        "name": "async",
+                        "type": "Boolean",
+                        "desc": "描述该载荷处理器属于异步处理还是同步处理。",
+                        "value": "no"
+                    },
+                    {
+                        "title": "",
+                        "name": "entrypoint",
+                        "type": "String",
+                        "desc": "",
+                        "value": "requester"
+                    }
+                ]
+            }
+        ]
+    }
+]

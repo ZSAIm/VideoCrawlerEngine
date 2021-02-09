@@ -1,0 +1,1362 @@
+{
+    "code": 0,
+    "msg": "ok",
+    "data": [{
+            "sign": "d4862e9e",
+            "url": "https://live.bilibili.com/910819",
+            "title": "猛男猫神的戴森球计划",
+            "name": "bilibili-live",
+            "percent": null,
+            "timeleft": null,
+            "status": "running",
+            "options": {},
+            "allRoots": {
+                "0": {
+                    "a": "0",
+                    "url": "https://live.bilibili.com/910819",
+                    "title": "猛男猫神的戴森球计划",
+                    "percent": null,
+                    "timeleft": null,
+                    "status": "running",
+                    "weight": 1,
+                    "root": {
+                        "name": "script",
+                        "sign": "71e30acc",
+                        "percent": 100,
+                        "status": "done",
+                        "speed": 0,
+                        "timeleft": 0,
+                        "data": {
+                            "url": "https://live.bilibili.com/910819",
+                            "name": "bilibili-live",
+                            "rule": 1,
+                            "quality": 0,
+                            "config": {
+                                "order": 100,
+                                "cookies": "",
+                                "proxies": "",
+                                "active": null,
+                                "default_rule": 1,
+                                "to_format": [
+                                    "mp4",
+                                    "mkv"
+                                ],
+                                "append": [
+                                    "cleanup"
+                                ],
+                                "maxsize": 1073741824.0
+                            },
+                            "title": "猛男猫神的戴森球计划",
+                            "n": 1
+                        }
+                    },
+                    "layers": [{
+                        "abc": "0-0-0",
+                        "percent": null,
+                        "ratio": 1.0
+                    }]
+                }
+            },
+            "runningRoots": [
+                "0"
+            ],
+            "allLayers": {
+                "0-0-0": {
+                    "abc": "0-0-0",
+                    "percent": null,
+                    "status": "running",
+                    "timeleft": null,
+                    "weight": 1,
+                    "nodes": [{
+                        "a5g": "0-0-0-1-0-0-0",
+                        "weight": 1,
+                        "ratio": 1.0,
+                        "percent": null
+                    }]
+                },
+                "0-0-1": {
+                    "abc": "0-0-1",
+                    "percent": 0.0,
+                    "status": "ready",
+                    "timeleft": null,
+                    "weight": 0.3,
+                    "nodes": [{
+                        "a5g": "0-0-1-1-0-1-0",
+                        "weight": 0.3,
+                        "ratio": 1.0,
+                        "percent": 0.0
+                    }]
+                }
+            },
+            "runningLayers": [
+                "0-0-0"
+            ],
+            "runningNodes": [
+                "0-0-0-1-0-0-0"
+            ],
+            "allNodes": {
+                "0-0-0-1-0-0-0": {
+                    "id": "253247ec808",
+                    "a5g": "0-0-0-1-0-0-0",
+                    "name": "live",
+                    "sign": "59439e86",
+                    "weight": 1,
+                    "percent": null,
+                    "status": "running",
+                    "speed": 0,
+                    "timeleft": null,
+                    "data": {}
+                },
+                "0-0-1-1-0-1-0": {
+                    "id": "25323f3ed88",
+                    "a5g": "0-0-1-1-0-1-0",
+                    "name": "cleanup",
+                    "sign": "742d75c4",
+                    "weight": 0.3,
+                    "percent": 0,
+                    "status": "ready",
+                    "speed": 0,
+                    "timeleft": null,
+                    "data": {}
+                }
+            },
+            "rawFlows": [
+                [
+                    [
+                        "0-0-0-1-0-0-0",
+                        "0-0-1-1-0-1-0"
+                    ]
+                ]
+            ]
+        },
+        {
+            "sign": "add73ac4",
+            "url": "https://www.bilibili.com/video/BV1Gz4y1S7fj",
+            "title": "网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决",
+            "name": "bilibili",
+            "percent": 100.0,
+            "timeleft": 0.0,
+            "status": "done",
+            "options": {},
+            "allRoots": {
+                "0": {
+                    "a": "0",
+                    "url": "https://www.bilibili.com/video/BV1Gz4y1S7fj",
+                    "title": "网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决",
+                    "percent": 100.0,
+                    "timeleft": 0,
+                    "status": "done",
+                    "weight": 2,
+                    "root": {
+                        "name": "script",
+                        "sign": "71e30acc",
+                        "percent": 100,
+                        "status": "done",
+                        "speed": 0,
+                        "timeleft": 0,
+                        "data": {
+                            "url": "https://www.bilibili.com/video/BV1Gz4y1S7fj",
+                            "name": "bilibili",
+                            "rule": 1,
+                            "quality": 16,
+                            "config": {
+                                "order": 100,
+                                "cookies": "",
+                                "proxies": "",
+                                "active": null,
+                                "default_rule": 1,
+                                "to_format": [
+                                    "mp4",
+                                    "mkv"
+                                ],
+                                "append": [
+                                    "checkpoint",
+                                    "cleanup"
+                                ]
+                            },
+                            "title": "网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决",
+                            "n": 1
+                        }
+                    },
+                    "layers": [{
+                        "abc": "0-0-0",
+                        "percent": 100.0,
+                        "ratio": 1.0
+                    }]
+                }
+            },
+            "runningRoots": [],
+            "allLayers": {
+                "0-0-0": {
+                    "abc": "0-0-0",
+                    "percent": 100.0,
+                    "status": "done",
+                    "timeleft": 0,
+                    "weight": 2,
+                    "nodes": [{
+                            "a5g": "0-0-0-2-0-0-0",
+                            "weight": 1,
+                            "ratio": 0.5,
+                            "percent": 50.0
+                        },
+                        {
+                            "a5g": "0-0-0-2-1-0-0",
+                            "weight": 1,
+                            "ratio": 0.5,
+                            "percent": 50.0
+                        }
+                    ]
+                },
+                "0-0-1": {
+                    "abc": "0-0-1",
+                    "percent": 100.0,
+                    "status": "done",
+                    "timeleft": 0,
+                    "weight": 1,
+                    "nodes": [{
+                        "a5g": "0-0-1-1-0-1-0",
+                        "weight": 1,
+                        "ratio": 1.0,
+                        "percent": 100.0
+                    }]
+                },
+                "0-0-2": {
+                    "abc": "0-0-2",
+                    "percent": 100.0,
+                    "status": "done",
+                    "timeleft": 0,
+                    "weight": 0.5,
+                    "nodes": [{
+                        "a5g": "0-0-2-1-0-2-0",
+                        "weight": 0.5,
+                        "ratio": 1.0,
+                        "percent": 100.0
+                    }]
+                },
+                "0-0-3": {
+                    "abc": "0-0-3",
+                    "percent": 100.0,
+                    "status": "done",
+                    "timeleft": 0,
+                    "weight": 0.3,
+                    "nodes": [{
+                        "a5g": "0-0-3-1-0-3-0",
+                        "weight": 0.3,
+                        "ratio": 1.0,
+                        "percent": 100.0
+                    }]
+                }
+            },
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {
+                "0-0-0-2-0-0-0": {
+                    "id": "253248ab3c8",
+                    "a5g": "0-0-0-2-0-0-0",
+                    "name": "download",
+                    "sign": "2db9a6a1",
+                    "weight": 1,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": 0,
+                    "timeleft": 0,
+                    "data": {
+                        "dstpath": "D:\\GitHub\\VideoCrawlerEngine\\bilibili\\网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决\\0-0-0-2-0-0-0[0].网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决",
+                        "filesize": 15601706
+                    }
+                },
+                "0-0-0-2-1-0-0": {
+                    "id": "253248a9d48",
+                    "a5g": "0-0-0-2-1-0-0",
+                    "name": "download",
+                    "sign": "2db9a6a1",
+                    "weight": 1,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": 0,
+                    "timeleft": 0,
+                    "data": {
+                        "dstpath": "D:\\GitHub\\VideoCrawlerEngine\\bilibili\\网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决\\0-0-0-2-1-0-0[0].网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决",
+                        "filesize": 2955578
+                    }
+                },
+                "0-0-1-1-0-1-0": {
+                    "id": "253248ab2c8",
+                    "a5g": "0-0-1-1-0-1-0",
+                    "name": "ffmpeg",
+                    "sign": "1e2cc10c",
+                    "weight": 1,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": "unknown",
+                    "timeleft": 0,
+                    "data": {
+                        "cmd": "ffmpeg -i \"D:\\GitHub\\VideoCrawlerEngine\\bilibili\\网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决\\0-0-0-2-0-0-0[0].网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决\" -i \"D:\\GitHub\\VideoCrawlerEngine\\bilibili\\网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决\\0-0-0-2-1-0-0[0].网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决\" -vcodec copy -acodec copy \"D:\\GitHub\\VideoCrawlerEngine\\bilibili\\网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决\\0-0-1-1-0-1-0[0].网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决.mp4\" -y",
+                        "dstpath": "D:\\GitHub\\VideoCrawlerEngine\\bilibili\\网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决\\0-0-1-1-0-1-0[0].网友给我寄了个料板 然而并不是所有数据恢复 都可以靠搬板解决.mp4",
+                        "input": [{
+                                "id": "0",
+                                "formats": [
+                                    "mov",
+                                    "mp4",
+                                    "m4a",
+                                    "3gp",
+                                    "3g2",
+                                    "mj2"
+                                ],
+                                "metadata": {
+                                    "major_brand": "iso5",
+                                    "minor_version": "1",
+                                    "compatible_brands": "avc1iso5dsmsmsixdash",
+                                    "encoder": "Lavf58.29.100",
+                                    "description": "Bilibili VXCode Swarm Transcoder v0.3.42_sync_fix"
+                                },
+                                "streams": [{
+                                    "duration": "00:05:51.30",
+                                    "start": "0.000000",
+                                    "bitrate": "355 kb/s",
+                                    "streams": [{
+                                        "id": "0",
+                                        "index": "0",
+                                        "description": "Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709), 640x360, 4 kb/s, 30 fps, 30 tbr, 16k tbn, 60 tbc (default)",
+                                        "metadata": {
+                                            "Metadata": "",
+                                            "handler_name": "VideoHandler"
+                                        },
+                                        "type": "video"
+                                    }]
+                                }]
+                            },
+                            {
+                                "id": "1",
+                                "formats": [
+                                    "mov",
+                                    "mp4",
+                                    "m4a",
+                                    "3gp",
+                                    "3g2",
+                                    "mj2"
+                                ],
+                                "metadata": {
+                                    "major_brand": "iso5",
+                                    "minor_version": "1",
+                                    "compatible_brands": "avc1iso5dsmsmsixdash",
+                                    "encoder": "Lavf58.29.100",
+                                    "description": "Bilibili VXCode Swarm Transcoder v0.3.42_sync_fix"
+                                },
+                                "streams": [{
+                                    "duration": "00:05:51.38",
+                                    "start": "0.000000",
+                                    "bitrate": "67 kb/s",
+                                    "streams": [{
+                                        "id": "1",
+                                        "index": "0",
+                                        "description": "Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 0 kb/s (default)",
+                                        "metadata": {
+                                            "Metadata": "",
+                                            "handler_name": "SoundHandler"
+                                        },
+                                        "type": "audio"
+                                    }]
+                                }]
+                            }
+                        ],
+                        "output": [{
+                            "id": "0",
+                            "formats": [
+                                "mp4"
+                            ],
+                            "metadata": {
+                                "major_brand": "iso5",
+                                "minor_version": "1",
+                                "compatible_brands": "avc1iso5dsmsmsixdash",
+                                "description": "Bilibili VXCode Swarm Transcoder v0.3.42_sync_fix",
+                                "encoder": "Lavf58.45.100"
+                            },
+                            "streams": []
+                        }]
+                    }
+                },
+                "0-0-2-1-0-2-0": {
+                    "id": "253247c36c8",
+                    "a5g": "0-0-2-1-0-2-0",
+                    "name": "checkpoint",
+                    "sign": "dfefe601",
+                    "weight": 0.5,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": 0,
+                    "timeleft": 0,
+                    "data": {}
+                },
+                "0-0-3-1-0-3-0": {
+                    "id": "2532487cd48",
+                    "a5g": "0-0-3-1-0-3-0",
+                    "name": "cleanup",
+                    "sign": "742d75c4",
+                    "weight": 0.3,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": 0,
+                    "timeleft": 0,
+                    "data": {}
+                }
+            },
+            "rawFlows": [
+                [
+                    [
+                        [
+                            ["1", ["2", "2-1"], "!"],
+                            ["3", "3-1", "3-2"]
+                        ],
+                        "4",
+                        "5",
+                        "6"
+                    ],
+                    [
+                        [
+                            [".1", [".2", ".2-1"], ".!"],
+                            [".3", ".3-1", ".3-2"]
+                        ],
+                        ".4",
+                        ".5",
+                        ".6"
+                    ]
+                ]
+            ]
+        },
+        {
+            "sign": "bd632082",
+            "url": "https://www.bilibili.com/video/BV1rT4y1N7PD",
+            "title": "小朋友的世界，有多可怕",
+            "name": "bilibili",
+            "percent": 100.0,
+            "timeleft": 0.0,
+            "status": "done",
+            "options": {},
+            "allRoots": {
+                "0": {
+                    "a": "0",
+                    "url": "https://www.bilibili.com/video/BV1rT4y1N7PD",
+                    "title": "小朋友的世界，有多可怕",
+                    "percent": 100.0,
+                    "timeleft": 0,
+                    "status": "done",
+                    "weight": 2,
+                    "root": {
+                        "name": "script",
+                        "sign": "71e30acc",
+                        "percent": 100,
+                        "status": "done",
+                        "speed": 0,
+                        "timeleft": 0,
+                        "data": {
+                            "url": "https://www.bilibili.com/video/BV1rT4y1N7PD",
+                            "name": "bilibili",
+                            "rule": 1,
+                            "quality": 16,
+                            "config": {
+                                "order": 100,
+                                "cookies": "",
+                                "proxies": "",
+                                "active": null,
+                                "default_rule": 1,
+                                "to_format": [
+                                    "mp4",
+                                    "mkv"
+                                ],
+                                "append": [
+                                    "checkpoint",
+                                    "cleanup"
+                                ]
+                            },
+                            "title": "小朋友的世界，有多可怕",
+                            "n": 1
+                        }
+                    },
+                    "layers": [{
+                        "abc": "0-0-0",
+                        "percent": 100.0,
+                        "ratio": 1.0
+                    }]
+                }
+            },
+            "runningRoots": [],
+            "allLayers": {
+                "0-0-0": {
+                    "abc": "0-0-0",
+                    "percent": 100.0,
+                    "status": "done",
+                    "timeleft": 0,
+                    "weight": 2,
+                    "nodes": [{
+                            "a5g": "0-0-0-2-0-0-0",
+                            "weight": 1,
+                            "ratio": 0.5,
+                            "percent": 50.0
+                        },
+                        {
+                            "a5g": "0-0-0-2-1-0-0",
+                            "weight": 1,
+                            "ratio": 0.5,
+                            "percent": 50.0
+                        }
+                    ]
+                },
+                "0-0-1": {
+                    "abc": "0-0-1",
+                    "percent": 100.0,
+                    "status": "done",
+                    "timeleft": 0,
+                    "weight": 1,
+                    "nodes": [{
+                        "a5g": "0-0-1-1-0-1-0",
+                        "weight": 1,
+                        "ratio": 1.0,
+                        "percent": 100.0
+                    }]
+                },
+                "0-0-2": {
+                    "abc": "0-0-2",
+                    "percent": 100.0,
+                    "status": "done",
+                    "timeleft": 0,
+                    "weight": 0.5,
+                    "nodes": [{
+                        "a5g": "0-0-2-1-0-2-0",
+                        "weight": 0.5,
+                        "ratio": 1.0,
+                        "percent": 100.0
+                    }]
+                },
+                "0-0-3": {
+                    "abc": "0-0-3",
+                    "percent": 100.0,
+                    "status": "done",
+                    "timeleft": 0,
+                    "weight": 0.3,
+                    "nodes": [{
+                        "a5g": "0-0-3-1-0-3-0",
+                        "weight": 0.3,
+                        "ratio": 1.0,
+                        "percent": 100.0
+                    }]
+                }
+            },
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {
+                "0-0-0-2-0-0-0": {
+                    "id": "2532484ca48",
+                    "a5g": "0-0-0-2-0-0-0",
+                    "name": "download",
+                    "sign": "2db9a6a1",
+                    "weight": 1,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": 0,
+                    "timeleft": 0,
+                    "data": {
+                        "dstpath": "D:\\GitHub\\VideoCrawlerEngine\\bilibili\\小朋友的世界，有多可怕\\0-0-0-2-0-0-0[0].小朋友的世界，有多可怕",
+                        "filesize": 11269492
+                    }
+                },
+                "0-0-0-2-1-0-0": {
+                    "id": "2532485cf88",
+                    "a5g": "0-0-0-2-1-0-0",
+                    "name": "download",
+                    "sign": "2db9a6a1",
+                    "weight": 1,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": 0,
+                    "timeleft": 0,
+                    "data": {
+                        "dstpath": "D:\\GitHub\\VideoCrawlerEngine\\bilibili\\小朋友的世界，有多可怕\\0-0-0-2-1-0-0[0].小朋友的世界，有多可怕",
+                        "filesize": 4826109
+                    }
+                },
+                "0-0-1-1-0-1-0": {
+                    "id": "2532484cf08",
+                    "a5g": "0-0-1-1-0-1-0",
+                    "name": "ffmpeg",
+                    "sign": "1e2cc10c",
+                    "weight": 1,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": "unknown",
+                    "timeleft": 0,
+                    "data": {
+                        "cmd": "ffmpeg -i D:\\GitHub\\VideoCrawlerEngine\\bilibili\\小朋友的世界，有多可怕\\0-0-0-2-0-0-0[0].小朋友的世界，有多可怕 -i D:\\GitHub\\VideoCrawlerEngine\\bilibili\\小朋友的世界，有多可怕\\0-0-0-2-1-0-0[0].小朋友的世界，有多可怕 -vcodec copy -acodec copy D:\\GitHub\\VideoCrawlerEngine\\bilibili\\小朋友的世界，有多可怕\\0-0-1-1-0-1-0[0].小朋友的世界，有多可怕.mp4 -y",
+                        "dstpath": "D:\\GitHub\\VideoCrawlerEngine\\bilibili\\小朋友的世界，有多可怕\\0-0-1-1-0-1-0[0].小朋友的世界，有多可怕.mp4",
+                        "input": [{
+                                "id": "0",
+                                "formats": [
+                                    "mov",
+                                    "mp4",
+                                    "m4a",
+                                    "3gp",
+                                    "3g2",
+                                    "mj2"
+                                ],
+                                "metadata": {
+                                    "major_brand": "iso5",
+                                    "minor_version": "1",
+                                    "compatible_brands": "avc1iso5dsmsmsixdash",
+                                    "encoder": "Lavf58.29.100",
+                                    "description": "Bilibili VXCode Swarm Transcoder v0.3.42_sync_fix"
+                                },
+                                "streams": [{
+                                    "duration": "00:09:35.00",
+                                    "start": "0.000000",
+                                    "bitrate": "156 kb/s",
+                                    "streams": [{
+                                        "id": "0",
+                                        "index": "0",
+                                        "description": "Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709), 640x360 [SAR 1:1 DAR 16:9], 0 kb/s, 25 fps, 25 tbr, 16k tbn, 50 tbc (default)",
+                                        "metadata": {
+                                            "Metadata": "",
+                                            "handler_name": "VideoHandler"
+                                        },
+                                        "type": "video"
+                                    }]
+                                }]
+                            },
+                            {
+                                "id": "1",
+                                "formats": [
+                                    "mov",
+                                    "mp4",
+                                    "m4a",
+                                    "3gp",
+                                    "3g2",
+                                    "mj2"
+                                ],
+                                "metadata": {
+                                    "major_brand": "iso5",
+                                    "minor_version": "1",
+                                    "compatible_brands": "avc1iso5dsmsmsixdash",
+                                    "encoder": "Lavf58.29.100",
+                                    "description": "Bilibili VXCode Swarm Transcoder v0.3.42_sync_fix"
+                                },
+                                "streams": [{
+                                    "duration": "00:09:35.04",
+                                    "start": "0.000000",
+                                    "bitrate": "67 kb/s",
+                                    "streams": [{
+                                        "id": "1",
+                                        "index": "0",
+                                        "description": "Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 0 kb/s (default)",
+                                        "metadata": {
+                                            "Metadata": "",
+                                            "handler_name": "SoundHandler"
+                                        },
+                                        "type": "audio"
+                                    }]
+                                }]
+                            }
+                        ],
+                        "output": [{
+                            "id": "0",
+                            "formats": [
+                                "mp4"
+                            ],
+                            "metadata": {
+                                "major_brand": "iso5",
+                                "minor_version": "1",
+                                "compatible_brands": "avc1iso5dsmsmsixdash",
+                                "description": "Bilibili VXCode Swarm Transcoder v0.3.42_sync_fix",
+                                "encoder": "Lavf58.45.100"
+                            },
+                            "streams": []
+                        }]
+                    }
+                },
+                "0-0-2-1-0-2-0": {
+                    "id": "253247cdc88",
+                    "a5g": "0-0-2-1-0-2-0",
+                    "name": "checkpoint",
+                    "sign": "dfefe601",
+                    "weight": 0.5,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": 0,
+                    "timeleft": 0,
+                    "data": {}
+                },
+                "0-0-3-1-0-3-0": {
+                    "id": "253247d0888",
+                    "a5g": "0-0-3-1-0-3-0",
+                    "name": "cleanup",
+                    "sign": "742d75c4",
+                    "weight": 0.3,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": 0,
+                    "timeleft": 0,
+                    "data": {}
+                }
+            },
+            "rawFlows": [
+                [
+                    [
+                        [
+                            "0-0-0-2-0-0-0",
+                            "0-0-0-2-1-0-0"
+                        ],
+                        "0-0-1-1-0-1-0",
+                        "0-0-2-1-0-2-0",
+                        "0-0-3-1-0-3-0"
+                    ],
+                    [
+                        [
+                            "z0-0-0-2-0-0-0",
+                            "z0-0-0-2-1-0-0"
+                        ],
+                        "z0-0-1-1-0-1-0",
+                        "z0-0-2-1-0-2-0",
+                        "z0-0-3-1-0-3-0"
+                    ],
+                    [
+                        [
+                            "x0-0-0-2-0-0-0",
+                            "x0-0-0-2-1-0-0"
+                        ],
+                        "x0-0-1-1-0-1-0",
+                        "x0-0-2-1-0-2-0",
+                        "x0-0-3-1-0-3-0"
+                    ]
+                ]
+            ]
+        },
+        {
+            "sign": "63285d4b",
+            "url": "https://www.bilibili.com/video/BV1zX4y1K73J",
+            "title": "活动作品言之游理：白皮书指点中国游戏江山，腾讯为何点名原神？",
+            "name": "bilibili",
+            "percent": 90.26889565764287,
+            "timeleft": 3.374086110254839,
+            "status": "running",
+            "options": {},
+            "allRoots": {
+                "0": {
+                    "a": "0",
+                    "url": "https://www.bilibili.com/video/BV1zX4y1K73J",
+                    "title": "活动作品言之游理：白皮书指点中国游戏江山，腾讯为何点名原神？",
+                    "percent": 90.26889565764287,
+                    "timeleft": 3.374086110254839,
+                    "status": "running",
+                    "weight": 2,
+                    "root": {
+                        "name": "script",
+                        "sign": "71e30acc",
+                        "percent": 100,
+                        "status": "done",
+                        "speed": 0,
+                        "timeleft": 0,
+                        "data": {
+                            "url": "https://www.bilibili.com/video/BV1zX4y1K73J",
+                            "name": "bilibili",
+                            "rule": 1,
+                            "quality": 16,
+                            "config": {
+                                "order": 100,
+                                "cookies": "",
+                                "proxies": "",
+                                "active": null,
+                                "default_rule": 1,
+                                "to_format": [
+                                    "mp4",
+                                    "mkv"
+                                ],
+                                "append": [
+                                    "checkpoint",
+                                    "cleanup"
+                                ]
+                            },
+                            "title": "活动作品言之游理：白皮书指点中国游戏江山，腾讯为何点名原神？",
+                            "n": 1
+                        }
+                    },
+                    "layers": [{
+                        "abc": "0-0-0",
+                        "percent": 90.26889565764287,
+                        "ratio": 1.0
+                    }]
+                }
+            },
+            "runningRoots": [
+                "0"
+            ],
+            "allLayers": {
+                "0-0-0": {
+                    "abc": "0-0-0",
+                    "percent": 90.26889565764287,
+                    "status": "running",
+                    "timeleft": 3.374086110254839,
+                    "weight": 2,
+                    "nodes": [{
+                            "a5g": "0-0-0-2-0-0-0",
+                            "weight": 1,
+                            "ratio": 0.5,
+                            "percent": 40.268895657642868
+                        },
+                        {
+                            "a5g": "0-0-0-2-1-0-0",
+                            "weight": 1,
+                            "ratio": 0.5,
+                            "percent": 50.0
+                        }
+                    ]
+                },
+                "0-0-1": {
+                    "abc": "0-0-1",
+                    "percent": 0.0,
+                    "status": "ready",
+                    "timeleft": null,
+                    "weight": 1,
+                    "nodes": [{
+                        "a5g": "0-0-1-1-0-1-0",
+                        "weight": 1,
+                        "ratio": 1.0,
+                        "percent": 0.0
+                    }]
+                },
+                "0-0-2": {
+                    "abc": "0-0-2",
+                    "percent": 0.0,
+                    "status": "ready",
+                    "timeleft": null,
+                    "weight": 0.5,
+                    "nodes": [{
+                        "a5g": "0-0-2-1-0-2-0",
+                        "weight": 0.5,
+                        "ratio": 1.0,
+                        "percent": 0.0
+                    }]
+                },
+                "0-0-3": {
+                    "abc": "0-0-3",
+                    "percent": 0.0,
+                    "status": "ready",
+                    "timeleft": null,
+                    "weight": 0.3,
+                    "nodes": [{
+                        "a5g": "0-0-3-1-0-3-0",
+                        "weight": 0.3,
+                        "ratio": 1.0,
+                        "percent": 0.0
+                    }]
+                }
+            },
+            "runningLayers": [
+                "0-0-0"
+            ],
+            "runningNodes": [
+                "0-0-0-2-0-0-0"
+            ],
+            "allNodes": {
+                "0-0-0-2-0-0-0": {
+                    "id": "25324ac83c8",
+                    "a5g": "0-0-0-2-0-0-0",
+                    "name": "download",
+                    "sign": "2db9a6a1",
+                    "weight": 1,
+                    "percent": 80.53779131528573,
+                    "status": "running",
+                    "speed": 874214.7958331792,
+                    "timeleft": 3.374086110254839,
+                    "data": {
+                        "dstpath": "D:\\GitHub\\VideoCrawlerEngine\\bilibili\\活动作品言之游理：白皮书指点中国游戏江山，腾讯为何点名原神？\\0-0-0-2-0-0-0[0].活动作品言之游理：白皮书指点中国游戏江山，腾讯为何点名原神？",
+                        "filesize": 15155916
+                    }
+                },
+                "0-0-0-2-1-0-0": {
+                    "id": "25324a99948",
+                    "a5g": "0-0-0-2-1-0-0",
+                    "name": "download",
+                    "sign": "2db9a6a1",
+                    "weight": 1,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": 0,
+                    "timeleft": 0,
+                    "data": {
+                        "dstpath": "D:\\GitHub\\VideoCrawlerEngine\\bilibili\\活动作品言之游理：白皮书指点中国游戏江山，腾讯为何点名原神？\\0-0-0-2-1-0-0[0].活动作品言之游理：白皮书指点中国游戏江山，腾讯为何点名原神？",
+                        "filesize": 5989912
+                    }
+                },
+                "0-0-1-1-0-1-0": {
+                    "id": "25324a59208",
+                    "a5g": "0-0-1-1-0-1-0",
+                    "name": "ffmpeg",
+                    "sign": "1e2cc10c",
+                    "weight": 1,
+                    "percent": 0,
+                    "status": "ready",
+                    "speed": 0,
+                    "timeleft": null,
+                    "data": {
+                        "cmd": null,
+                        "dstpath": null,
+                        "input": null,
+                        "output": null
+                    }
+                },
+                "0-0-2-1-0-2-0": {
+                    "id": "25323ef3648",
+                    "a5g": "0-0-2-1-0-2-0",
+                    "name": "checkpoint",
+                    "sign": "dfefe601",
+                    "weight": 0.5,
+                    "percent": 0,
+                    "status": "ready",
+                    "speed": 0,
+                    "timeleft": null,
+                    "data": {}
+                },
+                "0-0-3-1-0-3-0": {
+                    "id": "25323ef3bc8",
+                    "a5g": "0-0-3-1-0-3-0",
+                    "name": "cleanup",
+                    "sign": "742d75c4",
+                    "weight": 0.3,
+                    "percent": 0,
+                    "status": "ready",
+                    "speed": 0,
+                    "timeleft": null,
+                    "data": {}
+                }
+            },
+            "rawFlows": [
+                [
+                    [
+                        [
+                            "0-0-0-2-0-0-0",
+                            "0-0-0-2-1-0-0"
+                        ],
+                        "0-0-1-1-0-1-0",
+                        "0-0-2-1-0-2-0",
+                        "0-0-3-1-0-3-0"
+                    ]
+                ]
+            ]
+        },
+        {
+            "sign": "b362c6d",
+            "url": "https://www.bilibili.com/video/BV1cv4y1f7uM?spm_id_from=333.851.b_7265636f6d6d656e64.1",
+            "title": "活动作品是男人就下一百层30年前的隐藏剧情！ 我找到了仅在杂志上出现一次的线索",
+            "name": "bilibili",
+            "percent": 90.16688996881857,
+            "timeleft": 3.4446730924521198,
+            "status": "running",
+            "options": {},
+            "allRoots": {
+                "0": {
+                    "a": "0",
+                    "url": "https://www.bilibili.com/video/BV1cv4y1f7uM?spm_id_from=333.851.b_7265636f6d6d656e64.1",
+                    "title": "活动作品是男人就下一百层30年前的隐藏剧情！ 我找到了仅在杂志上出现一次的线索",
+                    "percent": 90.16688996881857,
+                    "timeleft": 3.4446730924521198,
+                    "status": "running",
+                    "weight": 2,
+                    "root": {
+                        "name": "script",
+                        "sign": "71e30acc",
+                        "percent": 100,
+                        "status": "done",
+                        "speed": 0,
+                        "timeleft": 0,
+                        "data": {
+                            "url": "https://www.bilibili.com/video/BV1cv4y1f7uM?spm_id_from=333.851.b_7265636f6d6d656e64.1",
+                            "name": "bilibili",
+                            "rule": 1,
+                            "quality": 16,
+                            "config": {
+                                "order": 100,
+                                "cookies": "",
+                                "proxies": "",
+                                "active": null,
+                                "default_rule": 1,
+                                "to_format": [
+                                    "mp4",
+                                    "mkv"
+                                ],
+                                "append": [
+                                    "checkpoint",
+                                    "cleanup"
+                                ]
+                            },
+                            "title": "活动作品是男人就下一百层30年前的隐藏剧情！ 我找到了仅在杂志上出现一次的线索",
+                            "n": 1
+                        }
+                    },
+                    "layers": [{
+                        "abc": "0-0-0",
+                        "percent": 90.16688996881857,
+                        "ratio": 1.0
+                    }]
+                }
+            },
+            "runningRoots": [
+                "0"
+            ],
+            "allLayers": {
+                "0-0-0": {
+                    "abc": "0-0-0",
+                    "percent": 90.16688996881857,
+                    "status": "running",
+                    "timeleft": 3.4446730924521198,
+                    "weight": 2,
+                    "nodes": [{
+                            "a5g": "0-0-0-2-0-0-0",
+                            "weight": 1,
+                            "ratio": 0.5,
+                            "percent": 40.16688996881857
+                        },
+                        {
+                            "a5g": "0-0-0-2-1-0-0",
+                            "weight": 1,
+                            "ratio": 0.5,
+                            "percent": 50.0
+                        }
+                    ]
+                },
+                "0-0-1": {
+                    "abc": "0-0-1",
+                    "percent": 0.0,
+                    "status": "ready",
+                    "timeleft": null,
+                    "weight": 1,
+                    "nodes": [{
+                        "a5g": "0-0-1-1-0-1-0",
+                        "weight": 1,
+                        "ratio": 1.0,
+                        "percent": 0.0
+                    }]
+                },
+                "0-0-2": {
+                    "abc": "0-0-2",
+                    "percent": 0.0,
+                    "status": "ready",
+                    "timeleft": null,
+                    "weight": 0.5,
+                    "nodes": [{
+                        "a5g": "0-0-2-1-0-2-0",
+                        "weight": 0.5,
+                        "ratio": 1.0,
+                        "percent": 0.0
+                    }]
+                },
+                "0-0-3": {
+                    "abc": "0-0-3",
+                    "percent": 0.0,
+                    "status": "ready",
+                    "timeleft": null,
+                    "weight": 0.3,
+                    "nodes": [{
+                        "a5g": "0-0-3-1-0-3-0",
+                        "weight": 0.3,
+                        "ratio": 1.0,
+                        "percent": 0.0
+                    }]
+                }
+            },
+            "runningLayers": [
+                "0-0-0"
+            ],
+            "runningNodes": [
+                "0-0-0-2-0-0-0"
+            ],
+            "allNodes": {
+                "0-0-0-2-0-0-0": {
+                    "id": "25324a66588",
+                    "a5g": "0-0-0-2-0-0-0",
+                    "name": "download",
+                    "sign": "2db9a6a1",
+                    "weight": 1,
+                    "percent": 80.33377993763715,
+                    "status": "running",
+                    "speed": 1877769.1892369055,
+                    "timeleft": 3.4446730924521198,
+                    "data": {
+                        "dstpath": "D:\\GitHub\\VideoCrawlerEngine\\bilibili\\活动作品是男人就下一百层30年前的隐藏剧情！ 我找到了仅在杂志上出现一次的线索\\0-0-0-2-0-0-0[0].活动作品是男人就下一百层30年前的隐藏剧情！ 我找到了仅在杂志上出现一次的线索",
+                        "filesize": 32890413
+                    }
+                },
+                "0-0-0-2-1-0-0": {
+                    "id": "25324a55b08",
+                    "a5g": "0-0-0-2-1-0-0",
+                    "name": "download",
+                    "sign": "2db9a6a1",
+                    "weight": 1,
+                    "percent": 100,
+                    "status": "done",
+                    "speed": 0,
+                    "timeleft": 0,
+                    "data": {
+                        "dstpath": "D:\\GitHub\\VideoCrawlerEngine\\bilibili\\活动作品是男人就下一百层30年前的隐藏剧情！ 我找到了仅在杂志上出现一次的线索\\0-0-0-2-1-0-0[0].活动作品是男人就下一百层30年前的隐藏剧情！ 我找到了仅在杂志上出现一次的线索",
+                        "filesize": 11648842
+                    }
+                },
+                "0-0-1-1-0-1-0": {
+                    "id": "25324a662c8",
+                    "a5g": "0-0-1-1-0-1-0",
+                    "name": "ffmpeg",
+                    "sign": "1e2cc10c",
+                    "weight": 1,
+                    "percent": 0,
+                    "status": "ready",
+                    "speed": 0,
+                    "timeleft": null,
+                    "data": {
+                        "cmd": null,
+                        "dstpath": null,
+                        "input": null,
+                        "output": null
+                    }
+                },
+                "0-0-2-1-0-2-0": {
+                    "id": "25323ea8ec8",
+                    "a5g": "0-0-2-1-0-2-0",
+                    "name": "checkpoint",
+                    "sign": "dfefe601",
+                    "weight": 0.5,
+                    "percent": 0,
+                    "status": "ready",
+                    "speed": 0,
+                    "timeleft": null,
+                    "data": {}
+                },
+                "0-0-3-1-0-3-0": {
+                    "id": "25324ae1a08",
+                    "a5g": "0-0-3-1-0-3-0",
+                    "name": "cleanup",
+                    "sign": "742d75c4",
+                    "weight": 0.3,
+                    "percent": 0,
+                    "status": "ready",
+                    "speed": 0,
+                    "timeleft": null,
+                    "data": {}
+                }
+            },
+            "rawFlows": [
+                [
+                    [
+                        [
+                            "0-0-0-2-0-0-0",
+                            "0-0-0-2-1-0-0"
+                        ],
+                        "0-0-1-1-0-1-0",
+                        "0-0-2-1-0-2-0",
+                        "0-0-3-1-0-3-0"
+                    ]
+                ]
+            ]
+        },
+        {
+            "sign": "6cc727ac",
+            "url": "https://www.bilibili.com/video/BV1GU4y147w2?spm_id_from=333.851.b_7265636f6d6d656e64.2",
+            "title": "6cc727ac",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "f488341f",
+            "url": "https://www.bilibili.com/video/BV1xX4y1K7gX?spm_id_from=333.851.b_7265636f6d6d656e64.3",
+            "title": "f488341f",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "3ffbea4b",
+            "url": "https://www.bilibili.com/video/BV16A411H7Cj?spm_id_from=333.851.b_7265636f6d6d656e64.4",
+            "title": "3ffbea4b",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "ddd2c82d",
+            "url": "https://www.bilibili.com/video/BV1r64y1f7gZ?spm_id_from=333.851.b_7265636f6d6d656e64.5",
+            "title": "ddd2c82d",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "bfcf8d93",
+            "url": "https://www.bilibili.com/video/BV1XV411t7rm?spm_id_from=333.851.b_7265636f6d6d656e64.6",
+            "title": "bfcf8d93",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "f2411476",
+            "url": "https://www.bilibili.com/video/BV1vA411p7HJ?spm_id_from=333.851.b_7265636f6d6d656e64.7",
+            "title": "f2411476",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "43267039",
+            "url": "https://www.bilibili.com/video/BV1wy4y1m7fR?spm_id_from=333.851.b_7265636f6d6d656e64.8",
+            "title": "43267039",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "748c9015",
+            "url": "https://www.bilibili.com/video/BV1Ly4y1D7Lv",
+            "title": "748c9015",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "e3a06332",
+            "url": "https://www.bilibili.com/video/BV1DZ4y1g7Kq",
+            "title": "e3a06332",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "5fb2a3b3",
+            "url": "https://www.bilibili.com/video/BV1ia411F796",
+            "title": "5fb2a3b3",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "ab5244c8",
+            "url": "https://www.bilibili.com/video/BV11t4y1Y7Av",
+            "title": "ab5244c8",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        },
+        {
+            "sign": "5121fc63",
+            "url": "https://www.bilibili.com/video/BV1Va411F7Rk",
+            "title": "5121fc63",
+            "name": "",
+            "percent": 0.0,
+            "timeleft": 0.0,
+            "status": "ready",
+            "options": {},
+            "allRoots": {},
+            "runningRoots": [],
+            "allLayers": {},
+            "runningLayers": [],
+            "runningNodes": [],
+            "allNodes": {},
+            "rawFlows": []
+        }
+    ]
+}

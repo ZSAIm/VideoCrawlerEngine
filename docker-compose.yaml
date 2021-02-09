@@ -1,0 +1,38 @@
+version: '3.2'
+services:
+
+  api:
+    build:
+      context: ./deploy/api
+      dockerfile: Dockerfile
+    ports:
+      - 2333:2333
+    volumes:
+
+    depends_on:
+      - mysql
+    container_name: vce_api
+
+  taskflow:
+    build:
+      context: ./deploy/taskflow
+      dockerfile: Dockerfile
+    ports:
+      - 2332:2332
+    volumes:
+
+    depends_on:
+      - mysql
+    container_name: vce_taskflow
+
+  script:
+    build:
+      context: ./deploy/script
+      dockerfile: Dockerfile
+    ports:
+      - 2331:2331
+    volumes:
+
+    depends_on:
+      - mysql
+    container_name: vce_script
