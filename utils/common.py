@@ -3,7 +3,8 @@ import re
 from datetime import datetime
 from binascii import crc32
 from requests.cookies import RequestsCookieJar, create_cookie
-
+import os
+from hashlib import sha256
 NoneType = type(None)
 
 
@@ -105,7 +106,7 @@ utility_package = {
     'current_time': current_time,
 }
 
-REG_SAFETY_FILENAME = re.compile(r'[\\/:*?"<>|\r\n]+')
+REG_SAFETY_FILENAME = re.compile(r'[\\/:*?"<>|\r\n& ]+')
 
 
 def safety_filename(origin):
@@ -123,3 +124,19 @@ def cat_a5g(a5g, cat_str='-'):
 def gen_sign(content: str, encoding='utf-8'):
     return f'{crc32(content.encode(encoding)):x}'
 
+
+def readable_file_size(byte_size, precise=3):
+    unitdict = {
+        'GB': 1024 * 1024 * 1024,
+        'MB': 1024 * 1024,
+        'KB': 1024,
+        'B': 1,
+    }
+    for k, v in unitdict.items():
+        if byte_size > v:
+            return f'{round(byte_size / v, precise)} {k}'
+    return f'{round(byte_size / v, precise)} B'
+
+
+def gen_token() -> str:
+    return sha256(os.urandom(32)).hexdigest()

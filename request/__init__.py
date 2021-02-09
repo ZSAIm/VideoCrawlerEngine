@@ -1,4 +1,3 @@
-# from helper.payload import export_func
 from helper.payload.request import (
     requester,
     Requester,
@@ -8,6 +7,7 @@ from helper.payload.cond import (
     optional,
     option,
     sequence,
+    concurrent,
 )
 
 
@@ -19,5 +19,5 @@ __all__ = [
     'optional',
     'option',
     'sequence',
-
+    'concurrent',
 ]

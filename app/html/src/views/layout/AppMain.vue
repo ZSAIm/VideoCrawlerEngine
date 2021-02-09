@@ -1,5 +1,10 @@
 <template>
-  <main id="main-container">
+  <main id="main-container"
+    :style="{width: mainApp.width + 'px',height: mainApp.height + 'px' }"
+  >
+    <RespAlert
+      :option="alertOptions"
+    ></RespAlert>
     <v-container
       fluid
     >
@@ -12,44 +17,36 @@
 
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import RespAlert from '@/components/popout/message/RespAlert/RespAlert'
 
 
 export default {
   name: 'AppMain',
   data(){
     return {
-      mainSize: {
-        height: 0,
-      }
     }
   },
   computed: {
-    // mainContainerDom(){
-    //   return document.getElementById('main-container')
-    // },
-    // statusBarDom(){
-    //   return document.getElementById('status-bar')
-    // },
+    ...mapState('app', [
+      'alertOptions',
+      'mainApp'
+    ]),
   },
   methods: {
     ...mapActions('app', [
       'initAppModule',
       'destroyAppModule'
     ])
-    // windowResize(){
-    //   this.mainSize.height = (
-    //       innerHeight - 
-    //       this.statusBarDom.offsetHeight - 
-    //       this.mainContainerDom.offsetTop
-    //   );
-    // }
   },
   mounted() {
     this.initAppModule()
   },
   destroyed(){
     this.destroyAppModule()
+  },
+  components: {
+    RespAlert
   }
 }
 </script>

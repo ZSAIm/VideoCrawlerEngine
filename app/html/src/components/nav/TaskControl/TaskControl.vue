@@ -1,13 +1,13 @@
 <template>
-  <div class="tool-box">
+  <div class="control-box">
     <v-toolbar dense>
-      <add-new-dialog
+      <AddNewDialog
         :options="dialogOptions"
-      ></add-new-dialog>
+      ></AddNewDialog>
 
-      <control-tool
+      <TaskTool
         :dialogOptions="dialogOptions"
-      ></control-tool>
+      ></TaskTool>
 
     </v-toolbar>
   </div>
@@ -16,8 +16,8 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import ControlTool from './layout/ControlTool'
-import AddNewDialog from './layout/AddNewDialog'
+import TaskTool from './layout/TaskTool'
+import AddNewDialog from '@/components/popout/dialog/AddNew/AddNew'
 
 export default {
   name: 'TaskControl',
@@ -33,7 +33,7 @@ export default {
   },
   components: {
     AddNewDialog,
-    ControlTool,
+    TaskTool,
   }
 }
 </script>
@@ -41,22 +41,9 @@ export default {
 
 <style lang='stylus' scoped>
 
-.tool-box
+.control-box
   display: flex
   flex-direction: row
-  .v-btn
-    height: 100%
-    border-radius: 0
-    
-    .v-icon
-      margin-right: 0.3rem
-  .tool-control
-    height: 100%
-
-    .v-btn
-      min-width: 2rem
-      padding: 0
-.v-dialog
-  border-radius: 0
+  
 
 </style>

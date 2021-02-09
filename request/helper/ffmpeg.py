@@ -1,5 +1,6 @@
 from .stream import PipeStreamHandler
 from datetime import datetime
+from helper.ctxtools import ctx
 import re
 
 REG_SIZE = re.compile(r'(\d+)([a-zA-Z]+)')
@@ -222,7 +223,7 @@ class FfmpegStreamHandler(PipeStreamHandler):
 
     def size(self):
         frame_dict = self._get_frame()
-        return frame_dict.get('size', frame_dict.get('Lsize', 'unknown'))
+        return frame_dict.get('size', 0)
 
     def complete_length(self):
         frame_dict = self._get_frame()
@@ -254,7 +255,6 @@ class FfmpegStreamHandler(PipeStreamHandler):
         return frame_dict.get('fps', 'unknown')
 
     async def _stream_handler(self, stream_id, line):
-        print(line, end='')
         if self.checkpoint(stream_id, line):
             self.output_sequences.append([])
             try:

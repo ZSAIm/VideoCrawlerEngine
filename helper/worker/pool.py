@@ -14,9 +14,8 @@ from helper.worker import Worker
 class ThreadPoolExecutor(object):
     def __init__(self, *args: Any, **kwargs: Any):
         self.executor = _ThreadPoolExecutor(*args, **kwargs)
-        # 控制
         self.semaphore = threading.Semaphore(self.executor._max_workers)
-        self._lock = threading.RLock()
+        self._lock = threading.Lock()
 
     def wait_ready(self):
         pass
@@ -35,6 +34,8 @@ class ThreadPoolExecutor(object):
         kwargs = kwargs or {}
         context = context or {}
         with self._lock:
+            # TODO: 以合理的方式控制线程数，避免空闲线程数过多造成IO负担。
+
             # 如果线程使用已经高于池子的最大承受力，新增线程
             while not self.semaphore.acquire(False):
                 self.executor._max_workers += 1
@@ -51,6 +52,9 @@ class ThreadPoolExecutor(object):
         future.add_done_callback(cb)
         return future
 
+    def shutdown(self, wait=True):
+        self.executor.shutdown(wait)
+
 
 class AsyncPoolExecutor(object):
     def __init__(self, *args: Any, **kwargs: Any):
@@ -59,6 +63,7 @@ class AsyncPoolExecutor(object):
         # 初始化协程事件循环
         self.executor.submit(self._forever_async_event_loop)
         self._ready_event = threading.Event()
+        self._close_event = threading.Event()
 
     def wait_ready(self):
         return self._ready_event.wait()
@@ -82,6 +87,8 @@ class AsyncPoolExecutor(object):
             finally:
                 loop.close()
 
+        self._close_event.set()
+
     def submit(
         self,
         fn: Callable,
@@ -97,6 +104,14 @@ class AsyncPoolExecutor(object):
             coro, self.loop
         )
 
+    def shutdown(self, wait=True):
+        loop = self.loop
+        loop.call_soon_threadsafe(loop.stop)
+        # 等待事件循环关闭
+        self._close_event.wait()
+        self.loop.close()
+        self.executor.shutdown(wait)
+
 
 _COMMON_THREAD_POOL = 0
 _COMMON_ASYNC_POOL = 1
@@ -110,7 +125,7 @@ def get_pool(
     worker: Worker
 ) -> Union[ThreadPoolExecutor, AsyncPoolExecutor]:
     """ 获取工作池。 """
-    if worker.meonly:
+    if worker.independent:
         # 独占线程
         pool = _POOL.get(id(worker))
         if not pool:
@@ -127,3 +142,8 @@ def get_pool(
         else:
             pool = _POOL[_COMMON_THREAD_POOL]
     return pool
+
+
+def shutdown(wait=True):
+    for name, pool in _POOL.items():
+        pool.shutdown(wait)

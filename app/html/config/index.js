@@ -10,12 +10,12 @@ module.exports = {
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',
         proxyTable: {
-            '/api/task': {
-                target: 'http://localhost:2332/',
+            '/api/': {
+                target: 'http://localhost:2333/',
                 changeOrigin: true,
-                pathRewrite: {
-                    '^/api/task': '/api/v1/task'
-                }
+                // pathRewrite: {
+                //     '^/api/task': '/api/v1/task'
+                // }
             }
         },
 

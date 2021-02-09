@@ -36,26 +36,11 @@ def submit(
         if force_sync:
             raise RuntimeError('强制使用同步future。')
     except RuntimeError:
-
-        # if worker.async_type:
-        # s = _submit
-        # else:
-        #     s = _asubmit()
         future = _submit(__worker, args, kwargs, context)
 
     else:
         coro = _asubmit(__worker, args, kwargs, context)
         future = asyncio.create_task(coro)
-        # if worker.async_type:
-        #     s = _asubmit
-        # else:
-        #     s = _submit
-        # s = _asubmit
-        # future = s(worker, *args, **kwargs)
-        # if isinstance(future, threadFuture):
-        #     future = try_async_future(future)
-    # if isinstance(future, threadFuture):
-    #     future = try_async_future(future)
 
     return future
 
@@ -71,14 +56,9 @@ def _submit(
     """
     pool = get_pool(worker)
     with worker:
-        # if worker.async_type:
-        #     ep = worker.entrypoint.arun
-        # else:
-        #     ep = worker.entrypoint.run
         future = pool.submit(
             worker,
             context,
-            # ep,
             args,
             kwargs
         )
@@ -98,12 +78,7 @@ async def _asubmit(
     pool = get_pool(worker)
 
     async with worker:
-        # if worker.async_type:
-        #     ep = worker.entrypoint.arun
-        # else:
-        #     ep = worker.entrypoint.run
         future = pool.submit(
-            # ep,
             worker,
             context,
             args,
@@ -114,4 +89,3 @@ async def _asubmit(
         result = await future
 
     return result
-    # return future

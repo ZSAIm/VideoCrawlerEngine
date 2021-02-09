@@ -6,6 +6,8 @@ function getStatusColor(status) {
         progressColor = 'grey'
     } else if (status == 'error') {
         progressColor = 'red'
+    } else if (status == 'stopped') {
+        progressColor = 'deep-orange'
     }
     progressColor += ' darken-4'
     return progressColor
@@ -16,7 +18,10 @@ function getItemsTotalStatus(items) {
     let status = 'done';
 
     for (let v of items) {
-        if (v.status == 'running') {
+        if (v.status == 'stopped') {
+            status = 'stopped'
+            break
+        } else if (v.status == 'running') {
             status = 'running'
             break
         } else if (v.status == 'error') {

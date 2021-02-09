@@ -37,7 +37,7 @@ stack_router = APIRouter()
 
 
 @script_router.get(
-    '/get_supported',
+    '/getSupported',
     response_model=GetSupportedResp
 )
 async def get_supported(
@@ -56,7 +56,7 @@ async def get_supported(
 
 
 @script_router.get(
-    '/get_versions',
+    '/getVersions',
     response_model=GetVersionsResp
 )
 async def get_versions(
@@ -96,7 +96,6 @@ async def exec_script(
     if not script_name:
         raise DataNotFound(f'找不到处理该链接的脚本。{param.url}')
     script_task = get_script(script_name)
-
     req = simple_script(
         url=param.url,
         rule=param.rule,
@@ -127,7 +126,7 @@ async def destroy_stack(
 
 
 @stack_router.post(
-    '/remote_apply',
+    '/remoteApply',
     response_model=RemoteApplyResp
 )
 async def remote_apply(
@@ -165,3 +164,26 @@ async def hit_stack(
     raise NotImplementedError()
 
 
+@script_router.post(
+    '/reload',
+    response_model=ExecuteScriptResp
+)
+async def reload_script(
+    param: ExecuteScriptParams,
+):
+    """ 重载脚本。"""
+    raise NotImplementedError()
+    # script_name = select_script(supported_script(param.url))
+    # if not script_name:
+    #     raise DataNotFound(f'找不到处理该链接的脚本。{param.url}')
+    # script_task = get_script(script_name)
+    # req = simple_script(
+    #     url=param.url,
+    #     rule=param.rule,
+    #     script_task=script_task,
+    # )
+    # result = await req.start_request()
+    # return ExecuteScriptResp(
+    #     # data=[dictify_payload(dict(req.iter_data()))]
+    #     data=dictify_payload(result)
+    # )

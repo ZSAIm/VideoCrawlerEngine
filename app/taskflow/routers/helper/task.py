@@ -5,6 +5,7 @@ from app.taskflow.taskmgr import TaskFlowManager
 from exception import DataExistsError, PageOutOfRange, DataNotFound
 from utils.common import gen_sign, cat_a5g
 from collections import deque
+from helper.codetable import NodeState
 
 __key_task: Dict[str, TaskFlowManager] = {}
 __task_lst: Deque[TaskFlowManager] = deque()
@@ -51,7 +52,7 @@ def list(
 
 def view(
     key: str,
-    more: bool = False
+    active: bool = False
 ):
     def format_mul(_val, _ratio=1, default=None):
         if _val in (None, float('inf')):
@@ -87,7 +88,8 @@ def view(
             'status': prog.status,
             'speed': prog.speed,
             'timeleft': timeleft,
-            'data': node.infodata() if more else {},
+            'data': node.infodata() if active else {},
+            'logs': []
         }
 
     # 运行节点
@@ -100,17 +102,20 @@ def view(
         abc = cat_a5g(abc)
         a5gs = [cat_a5g(n) for n in nodes]
         # 确定layer的总状态
-        status = 'done'
+        status = NodeState.DONE
         for n in a5gs:
             s = all_nodes[n]['status']
-            if s == 'running':
-                status = 'running'
+            if s == NodeState.STOPPED:
+                status = NodeState.STOPPED
                 break
-            elif s == 'error':
-                status = 'error'
+            elif s == NodeState.RUNNING:
+                status = NodeState.RUNNING
                 break
-            elif s == 'ready':
-                status = 'ready'
+            elif s == NodeState.ERROR:
+                status = NodeState.ERROR
+                break
+            elif s == NodeState.READY:
+                status = NodeState.READY
 
         # 计算执行层进度
         timeleft = format_sum([all_nodes[n]['timeleft'] for n in a5gs])
@@ -120,10 +125,10 @@ def view(
             'a5g': n,
             'weight': all_nodes[n]['weight'],
             'ratio': all_nodes[n]['weight'] / total_weight,
-            'percent': format_mul(all_nodes[n]['percent'], all_nodes[n]['weight'] / total_weight),
+            # 'percent': format_mul(all_nodes[n]['percent'], all_nodes[n]['weight'] / total_weight),
+            'percent': all_nodes[n]['percent'],
         } for n in a5gs]
-        percent = format_sum([node['percent'] for node in layer_nodes])
-
+        percent = format_sum([format_mul(node['percent'], node['ratio']) for node in layer_nodes])
         all_layers[abc] = {
             'abc': abc,
             'percent': percent,
@@ -152,25 +157,22 @@ def view(
             'ratio': layer['weight'] / total_weight
         } for layer in layers]
 
-        status = 'done'
+        status = NodeState.DONE
         for layer in layers:
             s = layer['status']
-            if s == 'running':
-                status = 'running'
+            if s == NodeState.STOPPED:
+                status = NodeState.STOPPED
                 break
-            elif s == 'error':
-                status = 'error'
+            elif s == NodeState.RUNNING:
+                status = NodeState.RUNNING
                 break
-            elif s == 'ready':
-                status = 'ready'
+            elif s == NodeState.ERROR:
+                status = NodeState.ERROR
+                break
+            elif s == NodeState.READY:
+                status = NodeState.READY
 
-        # percent = sum([layer['percent'] for layer in root_layers])
         percent = format_sum([layer['percent'] for layer in root_layers])
-        # try:
-        #     timeleft = sum([layer['timeleft'] for layer in layers])
-        # except TypeError:
-        #     # None + int
-        #     timeleft = None
         timeleft = format_sum([layer['timeleft'] for layer in layers])
 
         all_roots[a] = ({
@@ -190,7 +192,7 @@ def view(
                 'timeleft': root.progress.timeleft,
                 'data': root.infodata()
             },
-            'layers': root_layers,
+            # 'layers': root_layers,
         })
 
     running_roots = [cat_a5g(v) for v in task.running_roots]
@@ -204,18 +206,20 @@ def view(
         status = 'done'
         for root in all_roots.values():
             s = root['status']
-            if s == 'running':
-                status = 'running'
+            if s == NodeState.STOPPED:
+                status = NodeState.STOPPED
                 break
-            elif s == 'error':
-                status = 'error'
+            elif s == NodeState.RUNNING:
+                status = NodeState.RUNNING
                 break
-            elif s == 'ready':
-                status = 'ready'
+            elif s == NodeState.ERROR:
+                status = NodeState.ERROR
+                break
+            elif s == NodeState.READY:
+                status = NodeState.READY
     else:
         status = 'ready'
     timeleft = format_sum([root['timeleft'] for root in all_roots.values()])
-
     return {
         'sign': task.sign,
         'url': task.url,
@@ -227,11 +231,11 @@ def view(
         'status': status,
         'allRoots': all_roots,
         'runningRoots': running_roots,
-        'allLayers': all_layers if more else [],
-        'runningLayers': running_layers,
-        'allNodes': all_nodes if more else [],
+        # 'allLayers': all_layers if active else [],
+        # 'runningLayers': running_layers,
+        'allNodes': all_nodes if active else [],
         'runningNodes': running,
-        'rawFlows': task.raw_flow_node if more else [],
+        'rawFlows': task.raw_flow_node if active else [],
     }
 
 

@@ -2,7 +2,7 @@
   <v-bottom-navigation
     :value="value"
     color="primary"
-    id="status-bar"
+    id="statusbar-container"
   >
 
   </v-bottom-navigation>

@@ -39,7 +39,7 @@ export default {
 @import 'css/main.css';
   
 html
-  overflow-y: hidden
+  overflow-y: hidden !important
 
 .main-content
   display: flex

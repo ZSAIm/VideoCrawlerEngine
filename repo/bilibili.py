@@ -285,7 +285,6 @@ class BilibiliLive(ScriptBaseClass):
 
         # 直播持久化取流
         ctx.upload(item=live_daemon(
-            # lambda: self.get_live(room_id)
             export_func(lambda: self.get_live(room_id))
         ))
 

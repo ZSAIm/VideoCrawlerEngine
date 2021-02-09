@@ -107,7 +107,7 @@ def script_request(
     cli = get_client('script')
     result = cli.exec_script(
         url=url,
-        # rule=100
+        rule=rule
     )
     ctx.upload(**result)
     title = safety_filename(ctx.getdata('title', ''))
@@ -123,7 +123,7 @@ def script_request(
     items = ctx.getdata('items', [])
     if not items:
         item = ctx.getdata('item', None)
-        if item:
+        if item is not None:
             items = [item]
         else:
             raise ValueError('没有上传有效的处理流程。')

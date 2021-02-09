@@ -1,7 +1,8 @@
 
-from typing import List, Dict, Tuple, AnyStr, Any, Optional
+from typing import List, Dict, Tuple, AnyStr, Any, Optional, Union
 from pydantic import Field
 from pydantic.main import BaseModel
+from app.model.base import APIRespModel
 
 
 class ScriptModel(BaseModel):
@@ -33,8 +34,8 @@ class ListTaskModel(BaseModel):
     options: Dict = Field(title='任务选项设置')
     allRoots: Dict = Field(title='所有根节点')
     runningRoots: List[str] = Field(title='运行中的根节点')
-    allLayers: Dict = Field(title='执行主层信息')
-    runningLayers: List[str] = Field(title='运行中的执行主层')
+    # allLayers: Dict = Field(title='执行主层信息')
+    # runningLayers: List[str] = Field(title='运行中的执行主层')
     runningNodes: List[str] = Field(title='运行中的节点')
     allNodes: Dict = Field(title='所有节点')
     rawFlows: List = Field(title='原始节点流')
@@ -53,3 +54,54 @@ class ApplyModel(BaseModel):
     exc: str = Field(title='异常回溯消息。', default=None)
 
 
+class ConfItemModel(BaseModel):
+    title: str = Field(title='配置项标题')
+    name: str = Field(title='配置项名称')
+    tag: str = Field(title='配置项类型')
+    desc: str = Field(title='配置项描述')
+    value: Any = Field(title='配置项的值')
+    validation: Dict = Field(title='校验配置')
+    disabled: bool = Field(title='配置是否可修改')
+    extra: Dict = Field(title='额外信息')
+
+
+class ConfGroupModel(BaseModel):
+    title: str = Field(title='配置标题')
+    name: str = Field(title='配置名称')
+    items: List[ConfItemModel] = Field(title='组配置项列表')
+
+
+class AppConfModel(BaseModel):
+    title: str = Field(title='配置标题')
+    name: str = Field(title='配置名称')
+    groups: List[ConfGroupModel] = Field(title='组配置列表(SECTION)')
+
+
+class ModifyRespModel(BaseModel):
+    id: Any = Field(title='响应ID')
+    errcode: int = Field(title='错误代码')
+    errmsg: str = Field(title='错误响应消息')
+
+
+class AppStateModel(BaseModel):
+    id: str = Field(title='应用ID')
+    name: str = Field(title='应用名称')
+    latency: int = Field(title='延迟')
+
+
+class WorkerStateModel(BaseModel):
+    name: str = Field(title='工作者名称')
+    maxConcurrent: Optional[int] = Field(title='最大并发量')
+    independent: bool = Field(ttile='独占线程')
+    asyncType: bool = Field(title='异步类型')
+    count: int = Field(title='')
+
+
+class SystemStateModel(BaseModel):
+    worker: List[WorkerStateModel] = Field(title='工作者状态', default=[])
+
+
+class AppRespModel(APIRespModel):
+    name: str = Field(title='服务名称')
+    latency: float = Field(title='网络延迟(毫秒)')
+    gateway: str = Field(title='服务网关')

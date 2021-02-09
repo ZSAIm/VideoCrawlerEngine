@@ -27,6 +27,19 @@ function genModulesNamespaceStore(objs = [], fromStore = {}) {
     return fromStore
 }
 
+
+function capitalize(str) {
+    return str.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase())
+}
+
+
+function deepCopyJsonObject(obj) {
+    return JSON.parse(JSON.stringify(obj))
+}
+
+
 export {
     genModulesNamespaceStore,
+    capitalize,
+    deepCopyJsonObject,
 }

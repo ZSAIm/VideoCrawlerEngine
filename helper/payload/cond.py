@@ -125,3 +125,8 @@ def sequence(
 ) -> Sequence:
     return Sequence(*seqs)
 
+
+def concurrent(
+    *tasks
+) -> Concurrent:
+    return Concurrent(*tasks)

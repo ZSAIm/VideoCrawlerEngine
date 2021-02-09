@@ -7,6 +7,7 @@ from helper.codetable import (
     UNAUTHORIZED_ERROR,
     TOKEN_EXPIRED,
     ACCESS_EXPIRED,
+    CONNECT_TIMEOUT
 )
 
 
@@ -52,4 +53,15 @@ class RemoteApplyException(Exception):
         self.funcid = funcid
         self.context = context
         self.ret = ret
+        self.exc = exc
+
+
+class ConnectionTimeout(APIBaseError):
+    code = CONNECT_TIMEOUT
+
+
+class ClientResponseError(Exception):
+    def __init__(self, code, msg, exc):
+        self.code = code
+        self.msg = msg
         self.exc = exc

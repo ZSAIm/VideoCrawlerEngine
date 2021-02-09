@@ -1,5 +1,6 @@
 import * as types from '../mutation-types';
 import axios from '@/plugins/axios'
+import Vue from 'vue'
 
 const state = {
     taskRawItems: [],
@@ -32,6 +33,12 @@ const getters = {
         }
     },
     selectedTasks: state => state.selectedTasks,
+    isAllSelect(state) {
+        return Object.keys(state.selectedTasks).length == state.taskRawItems.length;
+    },
+    isEmptySelect(state) {
+        return Object.keys(state.selectedTasks).length == 0;
+    },
 };
 
 const mutations = {
@@ -45,14 +52,27 @@ const mutations = {
         state.activeTask.node = node_a5g;
     },
     [types.SELECT_TASK](state, key) {
-        this._vm.$set(state.selectedTasks, key, {});
+        Vue.set(state.selectedTasks, key, {});
     },
     [types.UNSELECT_TASK](state, key) {
-        this._vm.$delete(state.selectedTasks, key);
+        Vue.delete(state.selectedTasks, key);
     },
     [types.CLEAR_TASK_SELECT](state) {
         state.selectedTasks = {};
     },
+    [types.SELECT_ALL_TASK](state) {
+        state.selectedTasks = {};
+        for (let v of state.taskRawItems) {
+            Vue.set(state.selectedTasks, v.sign, {});
+        }
+    },
+    [types.SET_TASK_FETCH_TIMER](state, timer) {
+        state.fetchTimer = timer;
+    },
+    [types.CLEAR_TASK_FETCH_TIMER](state) {
+        clearTimeout(state.fetchTimer)
+        state.fetchTimer = null;
+    }
 };
 
 
@@ -92,12 +112,25 @@ const actions = {
         // 开始任务进度获取时钟
         let timerWorker = (() => {
             actions.getTaskList({ commit, state }).finally(() => {
+                if (state.fetchTimer == null) {
+                    // 定时器被中途暂停
+                    return
+                }
                 clearTimeout(state.fetchTimer);
-                state.fetchTimer = setTimeout(timerWorker, 1000);
+                commit(
+                    types.SET_TASK_FETCH_TIMER,
+                    setTimeout(timerWorker, 1000)
+                )
             });
         });
         if (state.fetchTimer != null) return;
-        timerWorker();
+        commit(
+            types.SET_TASK_FETCH_TIMER,
+            setTimeout(timerWorker, 1)
+        )
+    },
+    stopFetchTaskListTimer({ commit, state }) {
+        commit(types.CLEAR_TASK_FETCH_TIMER)
     },
     setActiveTaskKey({ commit }, taskKey) {
         // 设置激活任务KEY
@@ -117,11 +150,10 @@ const actions = {
         // 清空任务选择
         commit(types.CLEAR_TASK_SELECT);
     },
-    // isTaskSelected({ commit, state }, key) {
-    //     // 返回任务是否被选择
-    //     return state.selectedTasks[key] != undefined
-    // },
-    // isTaskSelected: ({ commit, state }, key) => state.selectedTasks[key] != undefined
+    async selectAllTask({ commit }) {
+        commit(types.SELECT_ALL_TASK)
+    },
+
 };
 
 export default {

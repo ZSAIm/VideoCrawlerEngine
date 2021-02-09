@@ -1,4 +1,12 @@
-from .base import ConfMeta, List
+from .base import (
+    ConfMeta,
+    UrlParse,
+    FileRealPath,
+    Integer,
+    Boolean,
+    String,
+    List
+)
 
 
 class TaskFlowConf(
@@ -6,6 +14,6 @@ class TaskFlowConf(
     file='conf/taskflow.ini',
     metaclass=ConfMeta
 ):
-    default_rule: int
+    default_rule: Integer()
     to_format: List(sep='|')
     append: List(sep=',')

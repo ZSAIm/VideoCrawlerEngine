@@ -15,15 +15,15 @@
         dense
       ></v-select>
     </v-toolbar>
-    <flow-chart
+    <FlowChart
       :options="taskFlowOptions"
       :rootSelect="rootSelect"
-    ></flow-chart>
-    <node-table
+    ></FlowChart>
+    <NodeTable
       id="task-table-container"
       :options="taskTableOptions"
       :rootSelect="rootSelect"
-    ></node-table>
+    ></NodeTable>
   </div>
 
 </template>

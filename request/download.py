@@ -4,6 +4,7 @@ from helper.ctxtools import ctx
 from request import requester
 from pydantic import BaseModel
 from utils.model import DefaultField
+from utils.common import readable_file_size
 from typing import Dict, List
 import threading
 import requests
@@ -15,6 +16,8 @@ import time
 class DownloadDataModel(BaseModel):
     dstpath: str = DefaultField(title='文件存储路径')
     filesize: int = DefaultField(title='文件大小')
+    downloadSize: int = DefaultField(title='已下载大小')
+    writeSize: int = DefaultField(title='已写入文件大小')
 
 
 @requester('download', weight=1, infomodel=DownloadDataModel)
@@ -36,16 +39,17 @@ async def download(
     def speed():
         nonlocal dl
         transfer_rate = dl.transfer_rate()
-        unitdict = {
-            'GB/s': 1024 * 1024 * 1024,
-            'MB/s': 1024 * 1024,
-            'KB/s': 1024,
-            'B/s': 1,
-        }
-        for k, v in unitdict.items():
-            if transfer_rate > v:
-                return f'{round(transfer_rate / v, 2)} {k}'
-        return f'{round(transfer_rate / v, 2)} B/s'
+        return f'{readable_file_size(transfer_rate)}/s'
+        # unitdict = {
+        #     'GB/s': 1024 * 1024 * 1024,
+        #     'MB/s': 1024 * 1024,
+        #     'KB/s': 1024,
+        #     'B/s': 1,
+        # }
+        # for k, v in unitdict.items():
+        #     if transfer_rate > v:
+        #         return f'{round(transfer_rate / v, 2)} {k}'
+        # return f'{round(transfer_rate / v, 2)} B/s'
     # 创建下载请求对象
     tempf = ctx.tempdir.mktemp()
     dlr = DlRequest(file_path=tempf.filepath)
@@ -64,6 +68,8 @@ async def download(
         ctx.upload(
             filesize=dl.file.size,
             dstpath=dl.file.pathname,
+            downloadSize=lambda: readable_file_size(dl.walk_length()),
+            writeSize=lambda: readable_file_size(dl.done_length()),
         )
         ctx.set_percent(dl.percent_complete)
         ctx.set_timeleft(dl.remaining_time)
@@ -93,6 +99,8 @@ async def download(
     ctx.upload(
         dstpath=dl.file.pathname,
         filesize=dl.file.size,
+        downloadSize=lambda: readable_file_size(dl.walk_length()),
+        writeSize=lambda: readable_file_size(dl.done_length()),
     )
 
 
@@ -116,16 +124,17 @@ async def stream_download(
 
     def speed():
         nonlocal avgspeed
-        unitdict = {
-            'GB/s': 1024 * 1024 * 1024,
-            'MB/s': 1024 * 1024,
-            'KB/s': 1024,
-            'B/s': 1,
-        }
-        for k, v in unitdict.items():
-            if avgspeed > v:
-                return f'{round(avgspeed / v, 2)} {k}'
-        return f'{avgspeed} B/s'
+        return f'{readable_file_size(avgspeed)}/s'
+        # unitdict = {
+        #     'GB/s': 1024 * 1024 * 1024,
+        #     'MB/s': 1024 * 1024,
+        #     'KB/s': 1024,
+        #     'B/s': 1,
+        # }
+        # for k, v in unitdict.items():
+        #     if avgspeed > v:
+        #         return f'{round(avgspeed / v, 2)} {k}'
+        # return f'{avgspeed} B/s'
 
     def percent():
         nonlocal total_size
@@ -149,6 +158,7 @@ async def stream_download(
             chunksize = 1024 * 4
             sizecnt = 0
             avgspeed = 0
+            donesize = 0
             starttime = time.time()
             if resp.content_length is None:
                 # 不确定的进度
@@ -163,6 +173,8 @@ async def stream_download(
             ctx.upload(
                 filesize=size,
                 dstpath=tempf.filepath,
+                downloadSize=lambda: readable_file_size(sizecnt),
+                writeSize=lambda: readable_file_size(donesize),
             )
             with tempf('wb') as f:
                 try:
@@ -175,6 +187,7 @@ async def stream_download(
                         # 缓冲溢出后写入文件
                         if buffcnt >= buffsize:
                             f.writelines(buff_lst)
+                            donesize = sum([len(buff) for buff in buff_lst], donesize)
                             buffcnt = 0
                             buff_lst = []
                         # 计算平均下载速度

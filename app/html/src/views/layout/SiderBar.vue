@@ -1,7 +1,7 @@
 <template>
-  <v-card>
-    <main-tab>
-    </main-tab>
+  <v-card id="siderbar-container">
+    <MainTab>
+    </MainTab>
   </v-card>
 </template>
 

@@ -83,9 +83,9 @@ export default {
     updateChartComputed(){
       // 节点图计算属性
       let rawFlowJSON = this.activeTaskRawItem ? JSON.stringify(this.activeTaskRawItem.rawFlows) : '[]';
-      this.$echarts && rawFlowJSON != this.historyFlowJSON 
       if(this.$echarts && rawFlowJSON != this.historyFlowJSON){
         this.historyFlowJSON = rawFlowJSON;
+        this.$echarts.clear();
         this.$echarts.setOption(this.chartsOption);
       }
     },
@@ -109,6 +109,7 @@ export default {
     updateChartForce(){
       this.$nextTick(() => {
         // 等待高度样式渲染结束在进行渲染节点图
+        this.$echarts.clear();
         this.$echarts.setOption(this.chartsOption)
         this.$echarts.resize()
       })
@@ -252,10 +253,10 @@ export default {
     let dom = document.getElementById('task-flow-container');
     let charts = echarts.init(dom);
     this.$echarts = charts;
-    window.testUpdate = () => {
-      this.$echarts.setOption(this.chartsOption);
-      this.$echarts.resize()
-    };
+    // window.testUpdate = () => {
+    //   this.$echarts.setOption(this.chartsOption);
+    //   this.$echarts.resize()
+    // };
   },
 }
 </script>

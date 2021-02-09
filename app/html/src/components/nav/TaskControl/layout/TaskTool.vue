@@ -1,10 +1,5 @@
 <template>
   <div class="tool-box">
-    <!-- <v-toolbar dense>
-      <add-new-dialog
-        :options="dialogOptions"
-      ></add-new-dialog> -->
-
       <v-btn 
         text
         @click="dialogOptions.show = true"
@@ -27,8 +22,22 @@
         >
           <v-icon>mdi-pause</v-icon>
         </v-btn>
+
+        <v-btn 
+          text
+          :disabled="isAllSelect"
+          @click="selectAllTask()"
+        >
+          <v-icon>mdi-select-all</v-icon>
+        </v-btn>
+        <v-btn 
+          text
+          :disabled="isEmptySelect"
+          @click="clearTaskSelect()"
+        >
+          <v-icon>mdi-select</v-icon>
+        </v-btn>
       </div>
-    <!-- </v-toolbar> -->
   </div>
 </template>
 
@@ -37,7 +46,7 @@
 import { mapGetters, mapState, mapActions } from 'vuex'
 
 export default {
-  name: 'ControlTool',
+  name: 'TaskTool',
   props: [
     'dialogOptions'
   ],
@@ -55,7 +64,8 @@ export default {
   computed: {
     ...mapGetters('task', [
       'selectedTasks',
-
+      'isAllSelect',
+      'isEmptySelect',
     ]),
     continuesButton(){
       return {
@@ -71,7 +81,8 @@ export default {
   methods: {
     ...mapActions('task', [
       'postStopTasks',
-
+      'clearTaskSelect',
+      'selectAllTask',
     ]),
     async stopSelectedTask(){
       let items = Object.keys(this.selectedTasks).map(v => ({
@@ -93,7 +104,7 @@ export default {
   margin-left: 0.5rem
 
   .v-btn
-    height: 100%
+    height: 100% !important
     border-radius: 0
     
     .v-icon

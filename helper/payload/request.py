@@ -15,20 +15,17 @@ from traceback import format_exc
 from contextlib import contextmanager, ExitStack
 from traceback import print_exc
 from typing import (
-    Any,
-    ClassVar,
-    Tuple,
-    List,
-    Dict,
-    Callable,
-    Union,
-    TypeVar,
-    Optional,
+    Any, ClassVar, Tuple,
+    List, Dict, Callable,
+    Union, TypeVar, Optional,
+    Deque
 )
 from pydantic import BaseModel
 from concurrent.futures import Future as threadFuture
 from asyncio.futures import Future as asyncFuture
 from .flow import FlowPayload
+from collections import deque
+from logging import Logger
 import threading
 import asyncio
 
@@ -53,7 +50,7 @@ def inline_prop(name: str):
 class Progress(object):
     """ """
     data: Dict
-    logs: List
+    logs: Deque
 
     __status__: str = NodeState.READY
     __percent__: float = 0
@@ -67,7 +64,7 @@ class Progress(object):
 
     def __init__(self):
         self.data = {}
-        self.logs = []
+        self.logs = deque()
 
         self.stopmaker = StopMaker()
 
@@ -78,6 +75,7 @@ class Progress(object):
     def stop(self):
         """ """
         if self.status in (NodeState.RUNNING, NodeState.QUEUING):
+            self.status = NodeState.STOPPED
             self.stopmaker.run()
 
     def getdata(self, key, default=None):
@@ -88,6 +86,10 @@ class Progress(object):
 
     def iterdata(self):
         return iter(self.data.items())
+
+    # def getlogs(self, offset=0, limit=None, desc=True):
+    #     if limit is None:
+    #         limit
 
     def upload(self, **kwargs):
         for k, v in kwargs.items():
@@ -206,6 +208,9 @@ class Requester(FlowPayload):
             for k in self.__infomodel__.__fields__.keys()
         }
 
+    def getlogs(self, offset=0, limit=None, desc=True):
+        return self.progress.getlogs(offset, limit, desc)
+
     async def stop(self) -> None:
         return await executor.submit(
             get_worker('stopper'),
@@ -234,7 +239,6 @@ def requester(
     root: bool = False,
     infomodel: ClassVar[BaseModel] = None,
     inherit: bool = True,
-    no_payload: bool = False,
 ):
     """ 简单请求构建器。
     Args:
@@ -243,7 +247,6 @@ def requester(
         root:
         infomodel: 有效数据类型
         inherit: 从父节点继承上下文
-        no_payload: 是否禁用搜索参数中的payload
     """
     def wrapper(func) -> Callable:
         """ 创建请求器构造器（类）。"""
@@ -403,7 +406,7 @@ def apply_requester_context(
     var_value = {
         progress_mapping_context: request.progress,
         request_mapping_context: request,
-        config_context: dict(get_conf('payload').get(request.NAME, {})),
+        config_context: dict(get_conf('worker').get(request.NAME, {})),
         self_request: request,
     }
     with ExitStack() as ctx_stack:

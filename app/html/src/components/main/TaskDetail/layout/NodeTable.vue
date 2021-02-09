@@ -205,7 +205,7 @@ export default {
         background-color: #4242428c
 
   >>> .v-row-group__header
-    background-color: #313131
+    background-color: #313131 !important
     padding: 0.2rem
 
   >>> .data-group-header

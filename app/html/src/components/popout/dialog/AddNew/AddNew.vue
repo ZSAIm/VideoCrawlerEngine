@@ -34,10 +34,10 @@
             key="uris"
           >
             <v-card flat>
-              <combobox 
+              <Combobox 
                 ref="combobox"
                 :options="comboboxOptions"
-              ></combobox>
+              ></Combobox>
             </v-card>
           </v-tab-item>
           <v-tab-item
@@ -84,7 +84,7 @@
 
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex'
-import Combobox from './DialogLayout/Combobox'
+import Combobox from './layout/Combobox'
 
 export default {
   name: 'AddNewDialog',

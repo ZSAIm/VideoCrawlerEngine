@@ -143,8 +143,7 @@ class TaskFlowManager(object):
             self.mounted_layers[(_a, _b, _c)].add(point)
 
         # 主层挂载到对应的脚本层下
-        if (_a,) not in self.mounted_roots:
-            self.mounted_roots[(_a,)].add(abc)
+        self.mounted_roots[(_a,)].add(abc)
 
         return point
 

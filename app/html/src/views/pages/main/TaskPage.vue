@@ -5,8 +5,8 @@
         v-if="activeTaskNode == ''"
         id="task-view-left"
       >
-        <task-view
-        ></task-view>
+        <TaskView
+        ></TaskView>
       </v-col>
     </transition>
 
@@ -15,8 +15,8 @@
         v-if="activeTaskKey != ''"
         id="task-view-right"
       >
-        <task-detail
-        ></task-detail>
+        <TaskDetail
+        ></TaskDetail>
       </v-col>
     </transition>
 
@@ -25,8 +25,8 @@
         v-if="activeTaskNode != ''"
         id="task-view-right-expand"
       >
-        <task-data
-        ></task-data>
+        <TaskData
+        ></TaskData>
       </v-col>
     </transition>
     
@@ -35,7 +35,7 @@
 
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import TaskView from '@/components/main/TaskView/TaskView'
 import TaskDetail from '@/components/main/TaskDetail/TaskDetail'
 import TaskData from '@/components/main/TaskData/TaskData'
@@ -44,7 +44,6 @@ import TaskData from '@/components/main/TaskData/TaskData'
 export default {
   name: 'TaskPage',
   props: [
-    'mainSize'
   ],
   data() {
     return {
@@ -59,12 +58,27 @@ export default {
 
   },
   methods: {
+    ...mapActions('task', [
+      'startFetchTaskListTimer',
+      'stopFetchTaskListTimer'
+    ])
   },
   components: {
     TaskView,
     TaskDetail,
     TaskData,
   },
+  mounted() {
+    
+    // 开启下载任务获取
+    this.startFetchTaskListTimer();
+
+    // 加载测试数据
+    // this.$store.dispatch('task/test')
+  },
+  destroyed(){
+    this.stopFetchTaskListTimer()
+  }
 }
 </script>
 

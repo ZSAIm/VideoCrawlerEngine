@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Any
 
 from pydantic import Field
 
@@ -9,6 +9,10 @@ from app.model.data import (
     ApplyModel,
     ListTaskModel,
     StopTaskModel,
+    AppConfModel,
+    ModifyRespModel,
+    SystemStateModel,
+    AppRespModel
 )
 
 
@@ -48,3 +52,21 @@ class ListTasksResp(APIRespModel):
     data: List[ListTaskModel] = Field(title='任务列表。')
 
 
+class ConfQueryResp(APIRespModel):
+    data: List[AppConfModel] = Field(title='应用配置选项')
+
+
+class ConfModifyResp(APIRespModel):
+    data: List[ModifyRespModel] = Field(title='配置修改响应结果')
+
+
+class SystemStateResp(APIRespModel):
+    data: SystemStateModel = Field(title='获取应用系统状态。', default=[])
+
+
+class ConfReloadResp(APIRespModel):
+    data: Any = Field(title='系统配置重载')
+
+
+class AppResponse(APIRespModel):
+    data: List[AppRespModel] = Field(title='系统状态响应')

@@ -24,17 +24,27 @@
             mdi-settings
           </v-icon>
         </v-tab>
+        <v-tab
+          :replace="true"
+          to="/info"
+        >
+          <v-icon 
+            left 
+          >
+            mdi-information
+          </v-icon>
+        </v-tab>
       </div>
 
       <v-spacer></v-spacer>
       
-      <div class="tab-bottom">
+      <!-- <div class="tab-bottom">
         <v-progress-circular
           :value="29"
           :size="22"
           color="deep-orange lighten-2"
         ></v-progress-circular>
-      </div>
+      </div> -->
     </v-tabs>
 </template>
 

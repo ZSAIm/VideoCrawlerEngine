@@ -6,11 +6,8 @@ from helper.payload import (
     Concurrent,
 )
 from helper.ctxtools import ctx
-from helper.worker import get_worker, executor
 from request import requester, Requester
-from request.ffmpeg import ffmpeg
 from typing import Callable, Awaitable
-from traceback import print_exc
 from .ffmpeg import ffmpeg
 from exception import RemoteApplyException
 import asyncio
@@ -25,7 +22,8 @@ async def live_daemon(
     """ 直播录像服务。
     """
     def _stop():
-        # 停止录播
+        # TODO: 对子流程层进行有效可控的停止，考虑到子流程的临时性
+        #       应优化子流程的实现方式，兼顾可控和高效。避免冗余信息
         nonlocal subflow
 
     checkinterval = ctx.glb.script['interval'] or 10

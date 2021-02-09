@@ -1,7 +1,7 @@
 {
     "name": "html",
     "version": "1.0.0",
-    "description": "A Vue.js project",
+    "description": "VCE前端代码",
     "author": "“ <zzsaim@163.com>",
     "private": true,
     "scripts": {

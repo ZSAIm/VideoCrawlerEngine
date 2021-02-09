@@ -57,3 +57,27 @@ class ListTaskParams(BaseModel):
     offset: int = Field(title='任务列表偏移（起始位置）', default=0)
     limit: int = Field(title='返回条数', default=20)
     active: Optional[str] = Field(title='选择的任务KEY', default=None)
+
+
+class QueryConfigureParams(BaseModel):
+    pass
+
+
+class ConfItemModifyParams(BaseModel):
+    link: List[str] = Field(title='修改索引链接')
+    newVal: Any = Field(title='修改后的值')
+    oldVal: Any = Field(title='修改前的值')
+
+
+class ConfModifyParams(BaseModel):
+    items: List[ConfItemModifyParams] = Field(title='被修改的项列表')
+
+
+class SystemStateParams(BaseModel):
+    """ 获取服务状态。 """
+
+
+class ConfReloadParams(BaseModel):
+    """ 服务配置重载。"""
+
+

@@ -10,23 +10,19 @@ class Worker:
         name: str,
         max_concurrent: int,
         async_type: bool,
-        meonly: bool,
+        independent: bool,
         entrypoint: Entrypoint,
         *args,
         **kwargs
     ):
         self.name = name
         self.entrypoint = entrypoint
-        if max_concurrent is None:
-            max_concurrent = float('inf')
+        if max_concurrent in (float('inf'),):
+            max_concurrent = None
         self.max_concurrent = max_concurrent
         self.async_type = async_type
-        self.meonly = meonly
-        # if async_type:
-        #     # 在第一次__aenter__所在的事件循环进行初始化
-        #     self.semaphore = None
-        # else:
-        self.semaphore = Semaphore(max_concurrent)
+        self.independent = independent
+        self.semaphore = Semaphore(float('inf') if max_concurrent is None else max_concurrent)
         self.count = 0
 
     def __enter__(self):
@@ -39,10 +35,11 @@ class Worker:
         self.semaphore.release()
 
     async def __aenter__(self):
-        # if self.semaphore is None:
         if not isinstance(self.semaphore, asyncio.Semaphore):
             # 只能用于同一个协程事件循环
-            self.semaphore = asyncio.Semaphore(self.max_concurrent)
+            self.semaphore = asyncio.Semaphore(
+                float('inf') if self.max_concurrent is None else self.max_concurrent
+            )
         await self.semaphore.acquire()
         self.count += 1
         return self

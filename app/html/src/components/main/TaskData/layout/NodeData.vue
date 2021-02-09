@@ -7,8 +7,9 @@
     disable-pagination
     :hide-default-footer="true"
     fixed-header
-    :height="options.height"
   >
+    <!-- :height="options.height" -->
+
     <template v-slot:item.value="{ item }">
       <div
         v-if="typeof item.value === 'object' && item.value != null"

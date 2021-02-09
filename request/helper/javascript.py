@@ -8,7 +8,7 @@ import os
 def js_session(source, timeout=None, engine=None):
     from request.utils import jsruntime
 
-    worker = get_conf('payload')['jsruntime']
+    worker = get_conf('worker')['jsruntime']
 
     timeout = timeout or worker.get('timeout', None)
     if not engine:

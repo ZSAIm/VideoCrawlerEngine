@@ -10,6 +10,8 @@ import os
 
 
 class ScriptBaseClass(object):
+    # TODO: 在保证上下文的情况，实现简单的脚本调试，测试脚本和流程的有效性
+
     name: str = None
 
     @classmethod
@@ -141,6 +143,7 @@ class Scripts:
         return iter(self.scripts.items())
 
 
+# TODO: 完善脚本校验，以方便未来使用线上仓库，
 def validate_script(source_byte, key):
     """ 脚本sha256校验。"""
     from hashlib import sha256

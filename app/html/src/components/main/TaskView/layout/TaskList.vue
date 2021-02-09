@@ -22,7 +22,7 @@
                   @click="toggleSelectItem(item.sign, 1)"
                   :class="{ 'selected-item': item.selected }"
                 >
-                    <v-avatar
+                    <!-- <v-avatar
                       color="info"
                       size="32"
                     >
@@ -30,7 +30,7 @@
                         {{ item.avatar }}
 
                       </span>
-                    </v-avatar>
+                    </v-avatar> -->
                     <v-list-item-content>
                       <div class="list-item-title">
                         <v-btn
@@ -117,7 +117,8 @@ export default {
   methods: {
     ...mapActions('task', [
       'updateTaskItemData',
-      'startFetchTaskListTimer',
+      // 'startFetchTaskListTimer',
+      // 'stopFetchTaskListTimer',
       'setActiveTaskKey',
       'toggleSelectTask',
       'clearTaskSelect',
@@ -183,14 +184,17 @@ export default {
     },
 
   },
-    mounted() {
-      
-      // 开启下载任务获取
-      this.startFetchTaskListTimer();
+  // mounted() {
+    
+  //   // 开启下载任务获取
+  //   this.startFetchTaskListTimer();
 
-      // 加载测试数据
-      // this.$store.dispatch('task/test')
-    }
+  //   // 加载测试数据
+  //   // this.$store.dispatch('task/test')
+  // },
+  // destroyed(){
+  //   this.stopFetchTaskListTimer()
+  // }
 
 }
 </script>
@@ -207,8 +211,8 @@ export default {
   transition: background-color 0.5s
 
   .v-list-item__title
-    font-weight: 600
-    transition: color 1s
+    font-weight: 600 !important
+    transition: color 0.5s
 
   &:hover:before
   &:focus:before
@@ -216,7 +220,7 @@ export default {
 
   &.selected-item
     background-color: #311d25 !important
-    transition: background-color 1s
+    transition: background-color 0.5s
 
     .v-list-item__title
       color: rgb(235, 51, 114) !important
@@ -236,7 +240,7 @@ export default {
 
   .v-list-item__title
     padding-left: 0.3rem
-    font-size: 0.95rem
+    font-size: 0.95rem !important
     margin-top: auto
     margin-bottom: auto
 

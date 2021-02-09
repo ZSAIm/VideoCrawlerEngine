@@ -3,6 +3,8 @@ from fastapi.routing import APIRoute
 import requests
 from requests import Session
 from urllib.parse import urljoin
+
+from exception import ClientResponseError
 from helper.conf import get_conf
 from typing import Sequence, Optional, Type, Any, List
 from helper.codetable import SUCCESS
@@ -22,8 +24,8 @@ def method_not_allowed(*args, **kwargs):
     raise NotImplementedError('不允许的方法。')
 
 
-class ClientResponseError(Exception):
-    pass
+def register_client(name, factory):
+    _NAME_CLIENTS[name] = factory
 
 
 class APIRequestMethod:
@@ -31,22 +33,24 @@ class APIRequestMethod:
 
     def __init__(
         self,
+        parent: Any,
         session: Session,
         gateway: str,
         path: str,
         methods: Sequence[str] = (),
         response_model: Optional[Type[Any]] = None,
         description: str = None,
-        agents: List = None,
+        hooks: List = None,
         doc: str = None,
     ):
+        self.parent = parent
         self.session = session
         self.gateway = gateway
         self.api = path
         self.methods = {m.lower() for m in methods}
         self.description = description
         self.response_model = response_model
-        self.agents = agents
+        self.hooks = hooks
 
         self.request_methods = {
             m: lambda kwargs: self._request_agent(m, kwargs)
@@ -54,10 +58,12 @@ class APIRequestMethod:
             for m in self.METHODS
         }
 
-    def _unpack_model_response(self, resp: requests.Response):
+    def _responder(self, resp: requests.Response):
         res_json = resp.json()
         if res_json['code'] != SUCCESS:
-            raise ClientResponseError(res_json['msg'])
+            raise ClientResponseError(res_json['code'], res_json['msg'])
+        if self.parent._raw:
+            return res_json
         return res_json['data']
 
     def _post(
@@ -66,14 +72,22 @@ class APIRequestMethod:
         headers: Optional[dict] = None,
         cookies: Optional[dict] = None,
     ):
+        if self.parent._headers:
+            headers = self.parent._headers
+        if self.parent._cookies:
+            cookies = self.parent._cookies
+
         resp = self.session.post(
             url=urljoin(self.gateway, self.api),
             json=params,
             headers=headers,
             cookies=cookies,
+            timeout=self.parent._timeout,
+            proxies=self.parent._proxies,
+            verify=self.parent._verify
         )
         if self.response_model:
-            return self._unpack_model_response(resp)
+            return self._responder(resp)
         return resp.json()
 
     def _get(
@@ -82,41 +96,72 @@ class APIRequestMethod:
         headers: Optional[dict] = None,
         cookies: Optional[dict] = None,
     ):
+        if self.parent._headers:
+            headers = self.parent._headers
+        if self.parent._cookies:
+            cookies = self.parent._cookies
+
         resp = self.session.get(
             url=urljoin(self.gateway, self.api),
             params=params,
             headers=headers,
             cookies=cookies,
+            timeout=self.parent._timeout,
+            proxies=self.parent._proxies,
+            verify=self.parent._verify
         )
         if self.response_model:
-            return self._unpack_model_response(resp)
+            return self._responder(resp)
         return resp.json()
 
     def _request_agent(self, method, params):
-        def next_agent(p, *args):
+        def next_hook(p, *args):
+            exc = None
             try:
-                agent = agents.popleft()
+                hook = hooks.popleft()
             except IndexError:
-                result = self.__getattribute__(f'_{method}')(p, *args)
-                return result
+                try:
+                    result = self.__getattribute__(f'_{method}')(p, *args)
+                    return result, exc
+                except Exception as err:
+                    exc = ClientResponseError(-1, str(err), exc)
+                    return None, exc
             else:
-                h = agent(self, p, *args)
+                h = hook(self, p, *args)
 
                 p, *args = next(h)
-                result = yield from next_agent(p, *args)
-                try:
-                    h.send(result)
-                except StopIteration as r:
-                    result = r.value
+                result, exc = yield from next_hook(p, *args)
+                if exc:
+                    try:
+                        h.throw(exc)
+                    except StopIteration as e:
+                        # 异常被捕获处理
+                        result = e.value
+                        exc = None
+                    except:
+                        # 异常未经处理交由下一个迭代器处理
+                        pass
                 else:
-                    raise RuntimeError
-                return result
+                    try:
+                        h.send(result)
+                    except StopIteration as r:
+                        result = r.value
+                    else:
+                        # 只允许使用一次的yield
+                        raise RuntimeError
+                return result, exc
 
-        agents = deque(self.agents)
+        hooks = deque(self.hooks)
+        if self.parent._hook:
+            hooks.appendleft(self.parent._hook)
         try:
-            next(next_agent(params, None, None))
+            next(next_hook(params, None, None))
         except StopIteration as r:
-            return r.value
+            res, exc = r.value
+            if exc:
+                # 最外层迭代器将抛出异常
+                raise exc
+            return res
         raise RuntimeError
 
     def __getattr__(self, item):
@@ -131,8 +176,24 @@ class APIRequestMethod:
 
 class APIClientMeta(type):
     def __new__(mcs, mcs_name, mcs_bases, mcs_namespace, **kwargs):
-        client_name = kwargs['name']
+        def api_factory(r, h):
+            def _request(self):
+                return APIRequestMethod(
+                    parent=self,
+                    session=session,
+                    gateway=get_conf('app')[server_name]['gateway'].geturl(),
+                    path=r.path,
+                    methods=r.methods,
+                    doc=r.endpoint.__doc__,
+                    description=r.description,
+                    response_model=r.response_model,
+                    hooks=h
+                )
+            return _request
 
+        client_name = kwargs['name']
+        if APIBaseClient not in mcs_bases:
+            mcs_bases += (APIBaseClient,)
         server_name = client_name
         module_path = f'app.{server_name}.app'
         before_keys = set(sys.modules.keys())
@@ -142,10 +203,10 @@ class APIClientMeta(type):
         session = requests.Session()
 
         # 调试模式
-        session.proxies = {
-            'http': '127.0.0.1:8888',
-            'https': '127.0.0.1:8888',
-        }
+        # session.proxies = {
+        #     'http': '127.0.0.1:8888',
+        #     'https': '127.0.0.1:8888',
+        # }
         new_namespace = mcs_namespace.copy()
 
         outer = mcs_namespace.get('__outer__', None)
@@ -157,21 +218,24 @@ class APIClientMeta(type):
             if not isinstance(route, APIRoute):
                 continue
 
-            agents = [h for h in [
+            hooks = [h for h in [
                 outer,
                 mcs_namespace.get(route.name, default),
                 inner,
             ] if h]
-            new_namespace[route.name] = APIRequestMethod(
-                session=session,
-                gateway=get_conf('app')[server_name]['gateway'].geturl(),
-                path=route.path,
-                methods=route.methods,
-                doc=route.endpoint.__doc__,
-                description=route.description,
-                response_model=route.response_model,
-                agents=agents
-            )
+
+            new_namespace[route.name] = property(api_factory(route, hooks))
+            # new_namespace[route.name] = property(lambda self: APIRequestMethod(
+            #     parent=self,
+            #     session=session,
+            #     gateway=get_conf('app')[server_name]['gateway'].geturl(),
+            #     path=route.path,
+            #     methods=route.methods,
+            #     doc=route.endpoint.__doc__,
+            #     description=route.description,
+            #     response_model=route.response_model,
+            #     hooks=hooks
+            # ))
 
         for k in diff_keys:
             del sys.modules[k]
@@ -182,6 +246,25 @@ class APIClientMeta(type):
             mcs_bases,
             new_namespace,
         )
-        _NAME_CLIENTS[client_name] = cls
+        register_client(client_name, cls)
         return cls
 
+
+class APIBaseClient:
+    def __init__(
+        self,
+        headers=None,
+        cookies=None,
+        timeout=None,
+        proxies=None,
+        verify=None,
+        raw=False,
+        hook=None,
+    ):
+        self._timeout = timeout
+        self._headers = headers
+        self._cookies = cookies
+        self._proxies = proxies
+        self._verify = verify
+        self._raw = raw
+        self._hook = hook
