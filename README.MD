@@ -40,18 +40,22 @@ VideoCrawlerEngine
 
 #### 任务列表 
 显示所有被创建的任务。
+
 ![任务列表](./docs/img/task view.png)
 
 #### 任务详情
 显示任务的具体运行情况，包括执行流程、进度、日志等情况。
+
 ![任务详情](./docs/img/task detail.png)
 
 #### 配置选项
 应用的所有可配置信息（配置文件处于``./conf/``目录下）
+
 ![配置选项](./docs/img/settings.png)
 
 #### 应用状态
 查看应用的运行状态，其中包括工作线程池运行情况。
+
 ![应用状态](./docs/img/app state.png)
 
 ## 安装
