@@ -60,7 +60,6 @@ export default {
   },
   computed: {
     activeItem(){
-      console.log(this.active)
       return this.active
     },
   },
