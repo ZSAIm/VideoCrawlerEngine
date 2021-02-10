@@ -61,7 +61,7 @@ class ConnectionTimeout(APIBaseError):
 
 
 class ClientResponseError(Exception):
-    def __init__(self, code, msg, exc):
+    def __init__(self, code, msg, exc=None):
         self.code = code
         self.msg = msg
         self.exc = exc

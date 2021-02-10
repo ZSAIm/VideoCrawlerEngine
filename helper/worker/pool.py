@@ -73,7 +73,7 @@ class AsyncPoolExecutor(object):
         if sys.platform == 'win32':
             loop = asyncio.ProactorEventLoop()
         else:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.new_event_loop()
 
         asyncio.set_event_loop(loop)
         self.loop = loop
