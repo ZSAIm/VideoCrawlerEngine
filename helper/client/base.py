@@ -225,21 +225,13 @@ class APIClientMeta(type):
             ] if h]
 
             new_namespace[route.name] = property(api_factory(route, hooks))
-            # new_namespace[route.name] = property(lambda self: APIRequestMethod(
-            #     parent=self,
-            #     session=session,
-            #     gateway=get_conf('app')[server_name]['gateway'].geturl(),
-            #     path=route.path,
-            #     methods=route.methods,
-            #     doc=route.endpoint.__doc__,
-            #     description=route.description,
-            #     response_model=route.response_model,
-            #     hooks=hooks
-            # ))
 
         for k in diff_keys:
             del sys.modules[k]
 
+        new_namespace.update({
+            '__cli_name__': client_name
+        })
         cls = super().__new__(
             mcs,
             mcs_name,
@@ -251,6 +243,8 @@ class APIClientMeta(type):
 
 
 class APIBaseClient:
+    __cli_name__: str
+
     def __init__(
         self,
         headers=None,
@@ -261,6 +255,8 @@ class APIBaseClient:
         raw=False,
         hook=None,
     ):
+        if timeout is None:
+            timeout = get_conf('app')[self.__cli_name__].get('timeout', 10)
         self._timeout = timeout
         self._headers = headers
         self._cookies = cookies

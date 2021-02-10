@@ -3,6 +3,7 @@ from .base import (
     UrlParse,
     FileRealPath,
     Integer,
+    Float,
     Boolean,
     String,
 )
@@ -29,6 +30,11 @@ class ApplicationConf(
     host: String(title='应用主机地址')
     port: Integer(title='应用端口')
     protocol: String(title='应用协议')
+
+    timeout: Float(
+        title='客户端超时时间',
+        desc='该参数指定使用helper.client来连接当前应用的时的连接超时时间。'
+    )
 
     # html
     dist: FileRealPath(title='前端HTML路径', desc='前端代码编译生成目录')
