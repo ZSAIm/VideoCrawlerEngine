@@ -267,6 +267,16 @@ class Integer(ItemLoader):
 class Float(ItemLoader):
     tag: str = 'TextField'
 
+    def __init__(
+        self,
+        min_value: int = None,
+        max_value: int = None,
+        **kwargs
+    ):
+        self.min = min_value
+        self.max = max_value
+        super().__init__(**kwargs)
+
     def load(self, origin: str) -> float:
         return float(origin)
 
