@@ -59,11 +59,11 @@ class ThreadPoolExecutor(object):
 class AsyncPoolExecutor(object):
     def __init__(self, *args: Any, **kwargs: Any):
         self.loop: BaseEventLoop
-        self.executor = ThreadPoolExecutor(max_workers=1)
+        self.executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix='AsyncPoolExecutor')
         # 初始化协程事件循环
-        self.executor.submit(self._forever_async_event_loop)
         self._ready_event = threading.Event()
         self._close_event = threading.Event()
+        self.executor.submit(self._forever_async_event_loop)
 
     def wait_ready(self):
         return self._ready_event.wait()
@@ -73,7 +73,7 @@ class AsyncPoolExecutor(object):
         if sys.platform == 'win32':
             loop = asyncio.ProactorEventLoop()
         else:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.new_event_loop()
 
         asyncio.set_event_loop(loop)
         self.loop = loop

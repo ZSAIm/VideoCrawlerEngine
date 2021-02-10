@@ -58,7 +58,6 @@ const mutations = {
         }
     },
     [types.SET_ACTIVE_CONF_ITEM](state, itemId) {
-        console.log('!!!!', itemId)
         state.activeItemId = itemId;
     },
     [types.CONF_ROLLBACK](state, groupId) {

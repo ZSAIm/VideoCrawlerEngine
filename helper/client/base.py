@@ -124,7 +124,7 @@ class APIRequestMethod:
                     result = self.__getattribute__(f'_{method}')(p, *args)
                     return result, exc
                 except Exception as err:
-                    exc = ClientResponseError(-1, str(err), exc)
+                    exc = ClientResponseError(-1, str(err), err)
                     return None, exc
             else:
                 h = hook(self, p, *args)
